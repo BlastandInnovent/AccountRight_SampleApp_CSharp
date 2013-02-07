@@ -1,0 +1,192 @@
+﻿@{//  File:        Index.cshtml
+//  Copyright:   Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+//  Website:     http://www.myob.com
+//  Author:      MYOB
+//  E-mail:      info@myob.com
+//
+//Documentation, code and sample applications provided by MYOB Australia are for 
+//information purposes only. MYOB Technology Pty Ltd and its suppliers make no 
+//warranties, either express or implied, in this document. 
+//
+//Information in this document or code, including website references, is subject
+//to change without notice. Unless otherwise noted, the example companies, 
+//organisations, products, domain names, email addresses, people, places, and 
+//events are fictitious. 
+//
+//The entire risk of the use of this documentation or code remains with the user. 
+//Complying with all applicable copyright laws is the responsibility of the user. 
+//
+//Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+}
+@{
+    ViewBag.Title = "General Journals";
+}
+
+<legend>Journals <button class="btn" id="btnCreateNewJournal"><i class="icon-file"></i> New</button></legend>
+@Html.Partial("_SearchJournals")
+
+<table id="journalList" class="table table-hover">
+    <thead class="well well-small">
+        <tr>
+            <th><a href="#" id="lnkOrderById">Number</a></th>
+            <th><a href="#" id="lnkOrderByMemo">Memo</a></th>
+            <th><a href="#" id="lnkOrderByGSTReportingMethod">Reporting</a></th>
+            <th><a href="#" id="lnkOrderByDateOccurred">Date Occurred</a></th>
+            <th style="text-align:center"><a href="#" id="lnkOrderByIsYearEndAdjustment">Year End Adjustment</a></th>
+            <th><a href="#" id="lnkOrderByCategoryId">Category</a></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr></tr>
+    </tbody>
+</table>
+<script type="text/javascript" src="@Url.Content("~/Scripts/GeneralJournal.js")"></script>
+<script>
+    $(function () {
+        if ('@((ViewContext.Controller as CSharpSamples.Common.IBusinessController).IsLogon)' == 'True') {
+            searchJournal();
+        }
+
+        $("#lnkOrderById").click(function (event) {
+            orderBy('Id');
+        });
+        $("#lnkOrderByMemo").click(function (event) {
+            orderBy('Memo');
+        });
+        $("#lnkOrderByGSTReportingMethod").click(function (event) {
+            orderBy('GSTReportingMethod');
+        });
+        $("#lnkOrderByDateOccurred").click(function (event) {
+            orderBy('DateOccurred');
+        });
+        $("#lnkOrderByIsYearEndAdjustment").click(function (event) {
+            orderBy('IsYearEndAdjustment');
+        });
+        $("#lnkOrderByCategoryId").click(function (event) {
+            orderBy('CategoryId');
+        });
+
+        var orderDirection = 'asc';
+        var orderField = "Id";
+        function orderBy(field) {
+            orderDirection = orderDirection == 'asc' ? 'desc' : 'asc';
+            orderField = field;
+            searchJournal();
+        }
+
+        function searchJournal() {
+            var search = $("#search").val();
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("Search")",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                data: JSON.stringify({
+                    field: $("#field").val(),
+                    search: search,
+                    yearEndAdjustment: $("#yearEndAdjustmentOption > button.active").val(),
+                    gstReportingMethod: $("#gstReportingMethodOption > button.active").val(),
+                    sort: { Field: orderField, Direction: orderDirection },
+                    pageCount: defaultPageCount
+                })
+            }
+            ).done(function (data) {
+                if (data.ok == false) {
+                    showMessageBox(data.message);
+                } else {
+                    applyPager($("#journalList"), data, "@Url.Action("GetPrevPage")", "@Url.Action("GetNextPage")", bindJournalList);
+                }
+            });
+        }
+
+        function bindJournalList(journals) {
+            $("#journalList > tbody > tr ").remove();
+            $.each(journals, function (i, journal) {
+                var journalRow = '<tr>'
+                    + ''
+                    + '<td><a href="#" onclick="javascript:goDetails(\'' + journal.Id + '\', false)">' + journal.Id + '</a></td>'
+                    + '<td>' + isNull(journal.Memo, "") + '</td>'
+                    + '<td>' + gstReportingMethod(journal.GSTReportingMethod) + '</td>'
+                    + '<td>' + formatJsonDate(journal.DateOccurred) + '</td>';
+
+                if (journal.IsYearEndAdjustment)
+                    journalRow += '<td style="text-align:center"><i class="icon-ok" /></td>';
+                else
+                    journalRow += '<td></td>';
+
+                journalRow += '<td>' + isNull(journal.CategoryId, "") + '</td>'
+                + '<td><button onclick="javascript:deleteJournal(\'' + journal.Id + '\',\'' + journal.Id + '\',\'' + '@Url.Action("Delete")' + '\',\'' + '@Url.Action("Index")' + '\')" class="btn btn-link"><i class="icon-trash"></i></button></td>'
+                + ''
+                + '</tr>';
+
+
+                $(journalRow).appendTo("#journalList > tbody");
+            });
+        }
+        function gstReportingMethod(method) {
+            if (method == 0)
+                return 'Sale';
+            else if (method == 1)
+                return 'Purchase';
+
+            return '';
+        }
+        $("#btnCreateNewJournal").click(function (event) {
+            window.location = '@Url.Action("CreateNew")';
+        });
+        $("#btnSearchJournal").click(function (event) {
+            event.preventDefault();
+            searchJournal();
+            return false;
+        });
+        $("#btnResetSearchJournal").click(function (event) {
+            event.preventDefault();
+
+            $("#gstReportingMethodOption").find("button").each(function () {
+                $(this).removeClass('active');
+                if ($(this).val() == '-1') {
+                    $(this).addClass('active');
+                }
+            });
+
+            $("#taxInclusiveOption").find("button").each(function () {
+                $(this).removeClass('active');
+                if ($(this).val() == '') {
+                    $(this).addClass('active');
+                }
+            });
+
+            $("#yearEndAdjustmentOption").find("button").each(function () {
+                $(this).removeClass('active');
+                if ($(this).val() == '') {
+                    $(this).addClass('active');
+                }
+            });
+
+            $("#search").val('');
+
+            searchJournal();
+            return false;
+        })
+
+        $("#field").change(function (event) {
+            switch ($(this).val()) {
+                case "DateOccurred":
+                    $('#search').get(0).type = 'text';
+                    $("#search").datepicker({ dateFormat: "yy-mm-dd", showAnim: "slideDown", showButtonPanel: true });
+                    break;
+                default:
+                    $('#search').get(0).type = 'text';
+                    $("#search").datepicker('destroy');
+                    break;
+            }
+
+        });
+    });
+
+        function goDetails(id) {
+
+            window.location = '@Url.Action("Details")/' + id;
+        }
+</script>

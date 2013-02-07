@@ -1,0 +1,67 @@
+﻿@{//  File:        _JournalLine.cshtml
+//  Copyright:   Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+//  Website:     http://www.myob.com
+//  Author:      MYOB
+//  E-mail:      info@myob.com
+//
+//Documentation, code and sample applications provided by MYOB Australia are for 
+//information purposes only. MYOB Technology Pty Ltd and its suppliers make no 
+//warranties, either express or implied, in this document. 
+//
+//Information in this document or code, including website references, is subject
+//to change without notice. Unless otherwise noted, the example companies, 
+//organisations, products, domain names, email addresses, people, places, and 
+//events are fictitious. 
+//
+//The entire risk of the use of this documentation or code remains with the user. 
+//Complying with all applicable copyright laws is the responsibility of the user. 
+//
+//Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+}
+@model CSharpSamples.GeneralJournal.Models.JournalLineModel
+
+            
+<tr class="editorRow">
+    @Html.HiddenFor(item => item.RowId)
+    @Html.HiddenFor(item => item.RowVersion)
+    <td>
+        <button type="button" class="btn btn-link" onclick="javascript:deleteLine(this)"><i class="icon-remove" ></i></button>
+    </td>
+    <td>
+        @Html.TextBoxFor(item => item.AccountId, new { style = "width: 80px;", @class="accountnumber" })
+    </td>
+                 
+    <td>
+        @Html.TextBoxFor(item => item.AccountName, new { style = "width: 150px;", @readonly = true })
+    </td>
+                 
+    <td>
+        @Html.TextBoxFor(item => item.Debit, new { style = "width: 80px;", @class="currency" })
+    </td>
+                 
+    <td>
+        @Html.TextBoxFor(item => item.Credit, new { style = "width: 80px;", @class = "currency" })
+    </td>
+                 
+    <td>
+        @Html.TextBoxFor(item => item.JobId, new { style = "width: 100px;" })
+    </td>
+                 
+    <td>
+        @Html.TextBoxFor(item => item.Memo, new { style = "width: 160px;" })
+    </td>
+                 
+                 
+    <td>
+        @Html.TextBoxFor(item => item.TaxCodeId, new { style = "width: 40px;" })
+    </td>
+    
+    <td>
+        @Html.TextBoxFor(item => item.TaxAmount, new { style = "width: 80px;", @class="currency" })
+    </td>
+           
+    <td>
+        @Html.CheckBoxFor(item => item.IsOverridenTaxAmount, new { style = "width: 20px;" })
+    </td> 
+</tr>
+
