@@ -1,0 +1,22 @@
+﻿<Project ToolsVersion="4.0"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CommonSharedResources">
+    <ItemGroup>
+      <_SharedFiles Include="$(TargetDir)\SharedResources\**\*" />
+      <FilesForPackagingFromProject Include="%(_SharedFiles.Identity)">
+        <DestinationRelativePath>%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+    </ItemGroup>
+  </Target>
+  <ItemGroup>
+    <ExcludeFromPackageFolders Include="bin\Scripts;bin\SharedResources;bin\Views">
+      <FromTarget>Project</FromTarget>
+    </ExcludeFromPackageFolders>
+  </ItemGroup>
+  <PropertyGroup>
+    <CopyAllFilesToSingleFolderForMsdeployDependsOn>
+      CommonSharedResources;
+      $(CopyAllFilesToSingleFolderForPackageDependsOn);
+    </CopyAllFilesToSingleFolderForMsdeployDependsOn>
+  </PropertyGroup>
+</Project>
