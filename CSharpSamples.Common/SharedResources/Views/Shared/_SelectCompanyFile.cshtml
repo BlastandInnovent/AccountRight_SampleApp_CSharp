@@ -49,6 +49,11 @@
                                 </div>
                             </div>
                             <div class="control-group">
+                                <label class="control-label" for="txtDevKey">Dev Key</label>
+                                <div class="controls"><input type="text" id="txtDevKey" class="span5" />
+                                </div>
+                            </div>
+                            <div class="control-group">
                                 <label class="control-label" for="txtClientId">Client ID</label>
                                 <div class="controls"><input type="text" id="txtClientId" class="span5" />
                                 </div>
@@ -147,6 +152,7 @@
         $('#txtAuthorizationUri').val('@oauthInfo.AuthorizationUrl');
         $("#txtTokenUri").val('@oauthInfo.TokenUrl');
         $("#txtClientId").val('@oauthInfo.ClientId');
+        $("#txtDevKey").val('@oauthInfo.DevKey');
         $("#txtClientSecret").val('@oauthInfo.ClientSecret');
         $("#txtRedirectUri").val('@oauthInfo.RedirectUri');
         $("#txtScope").val('@oauthInfo.Scope');
@@ -205,6 +211,7 @@
                 data: JSON.stringify({
                     authorizationUri: $('#txtAuthorizationUri').val(),
                     tokenUri: $("#txtTokenUri").val(),
+                    devKey: $("#txtDevKey").val(),
                     clientId: $("#txtClientId").val(),
                     clientSecret: $("#txtClientSecret").val(),
                     redirectUri: $("#txtRedirectUri").val(),

@@ -35,6 +35,7 @@ namespace CSharpSamples.Common.Context
                 if (isCloud)
                 {
                     req.Headers.Add("x-myobapi-cftoken", _login.EncodedCredential);
+                    req.Headers.Add("x-myobapi-key", OAuthInfo.DevKey);
                 }
                 else
                 {
