@@ -39,7 +39,7 @@ namespace CSharpSamples.Common.Context
                 }
                 else
                 {
-                    req.Headers.Add(HttpRequestHeader.Authorization, "Basic " + _login.EncodedCredential);
+                    req.Headers.Add(HttpRequestHeader.Authorization, "Bearer " + _login.EncodedCredential);
                     req.Headers.Add("Authorization-token", _login.AuthorizationToken);
                 }
             }
