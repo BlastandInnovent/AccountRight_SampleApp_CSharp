@@ -3,16 +3,294 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Accountright sampleapp csharp by MYOB-Technology</title>
+    <title>Accountright ContactSample php by MYOB-Technology</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet"  type="text/css" media="screen" href="css/bootstrap.css" />
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <style type="text/css">
+      @font-face {
+          font-family: "RouterLight";
+          src: url("http://myob.com.au/resources/css/fonts/Router-Light.eot") format("eot");
+          src: url("http://myob.com.au/resources/css/fonts/Router-Light.woff") format("woff"),url("http://myob.com.au/resources/css/fonts/Router-Light.svg#font") format("svg"),url("http://myob.com.au/resources/css/fonts/Router-Light.eot?#iefix") format("embedded-opentype"),            url("http://myob.com.au/resources/css/fonts/Router-Light.ttf") format("truetype");
+           font-weight:normal;
+           font-style:normal;
+           font-variant:normal;
+      }
+      @font-face {
+          font-family: "RouterBook";
+          src: url("http://myob.com.au/resources/css/fonts/Router-Book.eot") format("eot");
+          src: url("http://myob.com.au/resources/css/fonts/Router-Book.woff") format("woff"), url("http://myob.com.au/resources/css/fonts/Router-Book.svg#font") format("svg"), url("http://myob.com.au/resources/css/fonts/Router-Book.eot?#iefix") format("embedded-opentype"),      
+       url("http://myob.com.au/resources/css/fonts/Router-Book.ttf") format("truetype");
+           font-weight:normal;
+           font-style:normal; 
+           font-variant:normal;   
+      }
+
+      body {
+        padding-top: 0px;
+      }
+
+
+      #header {
+        background:white;
+        border-bottom:1px solid #eee;
+        padding:5px 0;
+        margin:0 0 20px 0;
+        height: 75px;
+        }
+        #headerContent {
+            width:900px;
+            margin:0 auto;
+        }
+        #headerContent h1 a {
+            color:#424242;
+        }
+        #headerContent h1,
+        #headerContent p {
+            padding:0;
+            margin:0;
+        }
+        #headerContent p {
+            padding-top:10px;
+        }
+
+        /* MYOB THEME */
+#myob_sign_in {
+    margin-top: -3px;
+    float: right;
+}
+#myob_nav_bar {
+    position: absolute;
+    top: 60px;
+    left: 0px;
+
+    background: #5c247b;
+    width: 100%;
+    height: 45px;
+    line-height: 50px;
+
+    z-index: 1;
+    text-align: center;
+}
+
+#myob_nav_bar ul {
+    text-align: left;
+    width: 900px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+#myob_nav_bar li {
+    display: inline-block;
+    height: 43px;
+
+    background: url("http://myob.com.au/resources/images/new/nav_divide.png") left 12px no-repeat;
+    list-style: none;
+    margin: 0;
+    padding: 0 14px;
+
+}
+
+#myob_nav_bar li:nth-child(1){
+    padding-left: 0;
+    background: none;
+}
+
+#myob_nav_bar li a {
+    font-family: 'RouterBook', Arial, Helvetica, sans-serif;
+    font-size: 19px;
+    line-height: 21px;
+    font-weight: normal;
+    display: block;
+    color: white;
+    width: auto;
+    text-decoration: none;
+    margin: 10px 0 0 0;
+    padding: 0;
+}
+
+#myob_nav_bar li a:nth-child(1){
+    margin-left: 0;
+}
+
+#myob_nav_bar li a:hover {
+    background: #89009e;
+}
+
+.btn-purple {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    background-color: #531e76;
+    background: linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
+    background: -o-linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
+    background: -moz-linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
+    background: -webkit-linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
+    background: -ms-linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
+    background: -webkit-gradient(linear, left bottom, left top, color-stop(0.07, rgb(71,27,103)), color-stop(0.5, rgb(88,33,125)));
+    color: #fff;
+    display: inline-block;
+    font-family: RouterBook, Arial, Helvetica, sans-serif;
+    font-size: 1.3em;
+    padding: 8px 14px;
+    text-shadow: 0 -1px 1px #000; 
+    text-rendering: optimizeLegibility; 
+    cursor: pointer;
+  }
+
+a.sign-in {
+  margin-top: 10px;
+}
+a.sign-in:hover {
+    color: white;
+}
+
+a.sign-in span {
+    background: url("http://myob.com.au/resources/images/new/sprite_icons.png") 0 2px no-repeat;
+    padding-left: 23px;
+  }
+
+.button-style a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+div#footer {
+    padding-top: 15px;
+    clear: both;
+    border-top: 1px solid;
+    border-color:  rgb(238, 238, 238);
+}
+
+#footer h3 {
+  font-size: 18px;
+  line-height: 20px;
+  padding-bottom: 5px;
+  margin-bottom: 2px;
+  font-family: Arial,Helvetica,sans-serif;
+  color: #5C247B;
+}
+
+#footer p.copyright {
+  padding: 20px 0 20px 20px;
+  clear: both;
+  font-weight: normal;
+}
+
+#footer ul {
+    display: none;
+    font-weight: normal;
+}
+
+.footerFour {
+    display: block;
+    margin-left: 30px;
+}
+
+#footer ul.footer-links {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+#footer ul.footer-links li {
+  display: block;
+  font-size: 13px;
+  line-height: 20px;
+  margin: 0;
+  padding: 0 0 0 0;
+}
+
+#footer ul.footer-links li a {
+  padding: 2px;
+  color: #333;
+}
+
+#footer ul.footer-links li a.muted {
+  padding: 2px;
+  color: #ccc;
+}
+
+#footer ul.footer-links li a:hover {
+  color: white;
+  background: rgb(92, 36, 123);
+  text-decoration: none;
+}
+
+#footer ul li.footer-logo {
+    margin-bottom: 10px;
+}
+
+#footer ul li.footer-logo a:hover {
+  background: none;
+}
+
+#footer ul.footer-links li.icon {
+  padding-left: 20px; 
+  background-position: left;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+
+#footer ul.footer-links li.express {
+  background: url(http://developer.myob.com/files/glyphicons_150_edit.png) no-repeat;
+  background-size: 16px 16px;
+}
+
+#footer ul.footer-links li.doc {
+  background: url(http://developer.myob.com/files/glyphicons_039_notes.png) no-repeat;
+  background-size: 16px 16px;
+}
+#footer ul.footer-links li.explore {
+  background: url(http://developer.myob.com/files/glyphicons_027_search.png) no-repeat;
+  background-size: 16px 16px;
+}
+#footer ul.footer-links li.samples {
+  background: url(http://developer.myob.com/files/glyphicons_059_cargo.png) no-repeat;
+  background-size: 16px 16px;
+}
+#footer ul.footer-links li.twitter {
+  background: url(http://developer.myob.com/files/glyphicons_411_twitter.png) no-repeat;
+  background-size: 16px 16px;
+}
+#footer ul.footer-links li.instagram {
+  background: url(http://developer.myob.com/files/glyphicons_412_instagram.png) no-repeat;
+  background-size: 16px 16px;
+}
+
+#footer ul.footer-links li.biz {
+  background: url(http://developer.myob.com/files/glyphicons_089_building.png) no-repeat;
+}
+
+#footer ul.footer-links li.footer-logo {
+  margin-top: 10px;
+}
+    </style>
   </head>
   <body>
+    <div id='header'>
+    <div id='headerContent'>
+    <div id='myob_sign_in'>
+        <a href="http://my.myob.com/" class="btn-purple sign-in pull-right"><span>Sign in</span></a>
+    </div>
+        <h1><a href="http://developer.myob.com" class="logo" ><img src="http://www.myob.com.au/resources/images/new/logo_header.gif" alt="MYOB" width="100" height="34"></a></h1>
+    <div id='myob_nav_bar'>
+        <ul>
+            <li class=" "><a href="http://developer.myob.com/">Home</a></li>
+            <li class=" "><a href="http://developer.myob.com/docs">Documentation</a></li>
+            <li class="active"><a href="http://myobapi.tumblr.com">Blog</a></li>
+        </ul>
+    </div>
+    </div>
+</div>
     <div class="wrapper">
       <header>
         <h1>Accountright sampleapp csharp</h1>
@@ -47,20 +325,60 @@ $ git checkout gh-pages
 
 <p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
 
-<h3>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/MYOB-Technology">MYOB-Technology</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
+<div class='footer' id="footer">
+            
+            
+            
+            <div class="footerFour row">
+                <div class="footer-box footer-one span3">
+                    <h3>API</h3>
+                    <ul class="footer-links">
+                        <li class="icon express"><a href="http://developer.myob.com/contact">Express your interest</a></li>
+                        <li class="icon doc"><a href="http://developer.myob.com/docs">API Documentation</a></li>
+                        <li class="icon explore"><a href="" class="muted">API Explorer</a></li>
+                        <li class="icon samples"><a href="http://developer.myob.com/docs/read/resources/code_samples/">API Samples</a></li>
+                        <li class="icon blog"><a href="http://myobapi.tumblr.com">MYOBapi Blog</a></li>
+                        <li class="icon "><a href="http://www.myob.com">MYOB Corporate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-box span3">
+                    <h3>Social</h3>
+                    <ul class="footer-links">
+                        <li class="icon twitter"><a href="http://www.twitter.com/myobapi">MYOBapi on Twitter</a></li>
+                        <li class="icon"><a href="http://www.twitter.com/">MYOB on Twitter</a></li>
+                        <li class="icon instagram"><a href="http://instagram.com/myobapi/">MYOBapi&nbsp;on&nbsp;Instagram</a></li>
+                        <li class="icon"><a href="" class="muted">MYOB on GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-box span3 pull-right">
+                    <ul class="footer-links">
+                        <li class="footer-logo"><a href="http://www.myob.com/"><img alt="MYOB" width="90"  src="http://developer.myob.com/files/logo_header.gif" /></a></li>
+                        <li><a href='http://myobapi.tumblr.com/rss'>RSS</a></li>
+                        <li><a href='/archive'>Archive</a></li>
+                        <li>Theme based on: <a href='http://www.tumblr.com/theme/6473'>Optimus</a></li>
+                    </ul>
+                </div>
+                <p class="copyright">Copyright © 2013 MYOB Technology Pty Ltd. All rights reserved.<br /><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+            </div><!-- four boxes -->            
+        </div>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    
+    <script type="text/javascript">
+//<![CDATA[
+var _gaq = _gaq || [];
+var pluginUrl = (('https:' == document.location.protocol) ?
+   'https://ssl.' : 'http://www.') +
+   'google-analytics.com/plugins/ga/inpage_linkid.js';
+_gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+_gaq.push(['_setAccount', 'UA-2310317-40']);
+_gaq.push(['_trackPageview']);
+ 
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+//]]>
+</script>
   </body>
 </html>
