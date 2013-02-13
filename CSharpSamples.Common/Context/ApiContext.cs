@@ -31,6 +31,14 @@ namespace CSharpSamples.Common.Context
 {
     public class ApiContext
     {
+        protected OAuthInfo OAuthInfo
+        {
+            get;private set;
+        }
+        public ApiContext(OAuthInfo oAuthInfo)
+        {
+            OAuthInfo = oAuthInfo;
+        }
         private HttpWebRequest CreateHttpRequest(string url, string method, bool isCloud, string accessToken)
         {
             var req = (HttpWebRequest)WebRequest.Create(url);
@@ -51,6 +59,7 @@ namespace CSharpSamples.Common.Context
             if (isCloud)
             {
                 req.Headers.Add(HttpRequestHeader.Authorization, "Basic " + accessToken);
+                req.Headers.Add("x-myobapi-Key", OAuthInfo.Key);
             }
 
             SetAuthorizationHeader(req, isCloud, accessToken);

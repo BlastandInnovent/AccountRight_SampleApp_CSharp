@@ -35,7 +35,6 @@ namespace CSharpSamples.Common.Context
                 if (isCloud)
                 {
                     req.Headers.Add("x-myobapi-cftoken", _login.EncodedCredential);
-                    req.Headers.Add("x-myobapi-key", OAuthInfo.DevKey);
                 }
                 else
                 {
@@ -51,13 +50,12 @@ namespace CSharpSamples.Common.Context
         }
     
         public CompanyFileContext(OAuthInfo oauthInfo)
+            :base(oauthInfo)
         {
-            OAuthInfo = oauthInfo;
         }
 
         private LoginContext _login;
         public string LoginUser { get { return _login == null ? string.Empty : _login.UserId; } }
-        public OAuthInfo OAuthInfo { get; private set; }
         public CompanyResourceModel CompanyFileResource { get; private set; }
 
         internal CompanyResourceModel Login(CompanyModel companyFile, string userId, string password)

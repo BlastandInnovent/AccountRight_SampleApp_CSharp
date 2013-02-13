@@ -34,7 +34,7 @@ namespace CSharpSamples.Common.Controllers
             if (isCloud)
             {
                 CloudApi = webApiUrl;
-                webApiUrl = webApiUrl.GetUrl(isCloud, OAuthInformation.ClientId);
+                webApiUrl = webApiUrl.GetUrl(isCloud, OAuthInformation);
             }
             else
                 NetworkApi = webApiUrl;

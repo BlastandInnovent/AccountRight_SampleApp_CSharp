@@ -67,15 +67,14 @@ namespace CSharpSamples.Common
             OAuthInformation.GetAuthorizationCode();
         }
 
-        public void SetOAuthInfo(string authorizationUri, string tokenUri, string devKey, string clientId, string clientSecret, string redirectUri, string scope, string cloudApi)
+        public void SetOAuthInfo(string authorizationUri, string tokenUri, string key, string secret, string redirectUri, string scope, string cloudApi)
         {
             OAuthInformation = new OAuthInfo
             {
                 AuthorizationUrl = authorizationUri,
                 TokenUrl = tokenUri,
-                DevKey = devKey,
-                ClientId = clientId,
-                ClientSecret = clientSecret,
+                Key = key,
+                Secret = secret,
                 RedirectUri = redirectUri,
                 Scope = scope
             };
@@ -101,7 +100,7 @@ namespace CSharpSamples.Common
         {
             get
             {
-                return new ApiContext();
+                return new ApiContext(OAuthInformation);
             }
         }
 
@@ -166,10 +165,9 @@ namespace CSharpSamples.Common
                     info = new OAuthInfo
                     {
                         AuthorizationUrl = ConfigurationManager.AppSettings["authorizationUrl"],
-                        DevKey = ConfigurationManager.AppSettings["devKey"],
+                        Key = ConfigurationManager.AppSettings["key"],
                         TokenUrl = ConfigurationManager.AppSettings["tokenUrl"],
-                        ClientId = ConfigurationManager.AppSettings["clientId"],
-                        ClientSecret = ConfigurationManager.AppSettings["clientSecret"],
+                        Secret = ConfigurationManager.AppSettings["secret"],
                         RedirectUri = ConfigurationManager.AppSettings["redirectUrl"],
                         Scope = ConfigurationManager.AppSettings["scope"]
                     };

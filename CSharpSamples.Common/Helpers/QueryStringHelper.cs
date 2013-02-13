@@ -130,18 +130,18 @@ namespace CSharpSamples.Common.Helpers
             return builder.Uri.ToString();
         }
         
-        public static string GetUrl(this string url, bool isCloud, string clientId)
+        public static string GetUrl(this string url, bool isCloud, OAuthInfo oAuthInfo)
         {
             if (isCloud)
             {
-                var builder = new UriBuilder(url);
+                //var builder = new UriBuilder(url);
 
-                if(!string.IsNullOrEmpty(builder.Query))
-                    builder.Query.Insert(0, string.Format("key={0}&", clientId));
-                else
-                    builder.Query =  string.Format("key={0}", clientId);
+                //if (!string.IsNullOrEmpty(builder.Query))
+                //    builder.Query.Insert(0, string.Format("key={0}&", oAuthInfo.DevKey));
+                //else
+                //    builder.Query = string.Format("key={0}&", oAuthInfo.DevKey);
 
-                return builder.Uri.ToString();
+                //return builder.Uri.ToString();
             }
 
             return url;

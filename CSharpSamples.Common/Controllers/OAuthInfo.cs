@@ -23,9 +23,8 @@ namespace CSharpSamples.Common
     {
         public string AuthorizationUrl { get; set; }
         public string TokenUrl { get; set; }
-        public string DevKey { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
+        public string Key { get; set; }
+        public string Secret { get; set; }
         public string RedirectUri { get; set; }
         public string Scope { get; set; }
         public OAuthToken Token { get; set; }
