@@ -49,18 +49,13 @@
                                 </div>
                             </div>
                             <div class="control-group">
-                                <label class="control-label" for="txtDevKey">Dev Key</label>
-                                <div class="controls"><input type="text" id="txtDevKey" class="span5" />
+                                <label class="control-label" for="txtKey">Key</label>
+                                <div class="controls"><input type="text" id="txtKey" class="span5" />
                                 </div>
                             </div>
                             <div class="control-group">
-                                <label class="control-label" for="txtClientId">Client ID</label>
-                                <div class="controls"><input type="text" id="txtClientId" class="span5" />
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label" for="txtClientSecret">Client Secret</label>
-                                <div class="controls"><input type="text" id="txtClientSecret" class="span5" />
+                                <label class="control-label" for="txtSecret">Secret</label>
+                                <div class="controls"><input type="text" id="txtSecret" class="span5" />
                                 </div>
                             </div>
                             <div class="control-group">
@@ -151,9 +146,8 @@
 
         $('#txtAuthorizationUri').val('@oauthInfo.AuthorizationUrl');
         $("#txtTokenUri").val('@oauthInfo.TokenUrl');
-        $("#txtClientId").val('@oauthInfo.ClientId');
-        $("#txtDevKey").val('@oauthInfo.DevKey');
-        $("#txtClientSecret").val('@oauthInfo.ClientSecret');
+        $("#txtKey").val('@oauthInfo.Key');
+        $("#txtSecret").val('@oauthInfo.Secret');
         $("#txtRedirectUri").val('@oauthInfo.RedirectUri');
         $("#txtScope").val('@oauthInfo.Scope');
         $("#txtAccessToken").val('@oauthInfo.AccessToken');
@@ -211,9 +205,8 @@
                 data: JSON.stringify({
                     authorizationUri: $('#txtAuthorizationUri').val(),
                     tokenUri: $("#txtTokenUri").val(),
-                    devKey: $("#txtDevKey").val(),
-                    clientId: $("#txtClientId").val(),
-                    clientSecret: $("#txtClientSecret").val(),
+                    key: $("#txtKey").val(),
+                    secret: $("#txtSecret").val(),
                     redirectUri: $("#txtRedirectUri").val(),
                     scope: $("#txtScope").val(),
                     cloudApi: $("#txtCloudApi").val()

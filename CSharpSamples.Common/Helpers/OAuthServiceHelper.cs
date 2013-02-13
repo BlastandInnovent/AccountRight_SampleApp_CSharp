@@ -30,10 +30,9 @@ namespace CSharpSamples.Common.Helpers
     {
         public static void GetAuthorizationCode(this OAuthInfo info)
         {
-            var authorizationParams = string.Format("?client_id={0}&redirect_uri={1}&scope={2}&response_type=code", info.ClientId, info.RedirectUri, info.Scope);
+            var authorizationParams = string.Format("?client_id={0}&redirect_uri={1}&scope={2}&response_type=code", info.Key, HttpUtility.UrlEncode(info.RedirectUri), info.Scope);
 
             var authorizationUri = info.AuthorizationUrl + authorizationParams;
-
             HttpContextFactory.Current.Response.Redirect(authorizationUri);
         }
 
@@ -52,7 +51,7 @@ namespace CSharpSamples.Common.Helpers
                 return;
             }
             var accessTokenBody = string.Format("client_id={0}&client_secret={1}&scope={2}&code={3}&redirect_uri={4}&grant_type=authorization_code",
-            info.ClientId, info.ClientSecret, info.Scope, code, info.RedirectUri);
+            info.Key, info.Secret, info.Scope, code, info.RedirectUri);
 
             var reply = DoPost(info.TokenUrl, accessTokenBody);
             var tokenJson = JsonConvert.DeserializeObject<dynamic>(reply);
@@ -69,7 +68,7 @@ namespace CSharpSamples.Common.Helpers
         public static OAuthToken RefreshToken(this OAuthInfo info)
         {
             var accessTokenBody = string.Format("client_id={0}&client_secret={1}&refresh_token={2}&grant_type=refresh_token",
-            info.ClientId, info.ClientSecret, info.RefreshToken);
+            info.Key, info.Secret, info.RefreshToken);
 
             var reply = DoPost(info.TokenUrl, accessTokenBody);
             var tokenJson = JsonConvert.DeserializeObject<dynamic>(reply);

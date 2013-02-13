@@ -10,19 +10,19 @@ namespace CSharpSamples.Common.Helpers
     {
         public static string GetUrl(this CompanyModel company, OAuthInfo info)
         {
-            return company.Uri.GetUrl(company.IsCloud, info.ClientId);
+            return company.Uri.GetUrl(company.IsCloud, info);
         }
 
         public static string GetResourceUri(this CompanyResourceModel companyResource, string resource, OAuthInfo info, int? pageCount = null)
         {
-            return GetResourceUri(companyResource, resource).GetUrl(companyResource.CompanyFile.IsCloud, info.ClientId);
+            return GetResourceUri(companyResource, resource).GetUrl(companyResource.CompanyFile.IsCloud, info);
         }
 
         public static string GetResourceByIdUri(this CompanyResourceModel companyResource, string resource, string id, OAuthInfo info)
         {
             var resourceByIdUri = GetResourceUri(companyResource, resource) + "/" + id;
 
-            return resourceByIdUri.GetUrl(companyResource.CompanyFile.IsCloud, info.ClientId);
+            return resourceByIdUri.GetUrl(companyResource.CompanyFile.IsCloud, info);
         }
 
         private static string GetResourceUri(CompanyResourceModel companyResource, string resource)
