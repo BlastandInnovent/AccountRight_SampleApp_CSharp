@@ -1,312 +1,217 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Accountright ContactSample php by MYOB-Technology</title>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>C# Sample for MYOB AccountRight Live API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet"  type="text/css" media="screen" href="css/bootstrap.css" />
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <style type="text/css">
-      @font-face {
-          font-family: "RouterLight";
-          src: url("http://myob.com.au/resources/css/fonts/Router-Light.eot") format("eot");
-          src: url("http://myob.com.au/resources/css/fonts/Router-Light.woff") format("woff"),url("http://myob.com.au/resources/css/fonts/Router-Light.svg#font") format("svg"),url("http://myob.com.au/resources/css/fonts/Router-Light.eot?#iefix") format("embedded-opentype"),            url("http://myob.com.au/resources/css/fonts/Router-Light.ttf") format("truetype");
-           font-weight:normal;
-           font-style:normal;
-           font-variant:normal;
-      }
-      @font-face {
-          font-family: "RouterBook";
-          src: url("http://myob.com.au/resources/css/fonts/Router-Book.eot") format("eot");
-          src: url("http://myob.com.au/resources/css/fonts/Router-Book.woff") format("woff"), url("http://myob.com.au/resources/css/fonts/Router-Book.svg#font") format("svg"), url("http://myob.com.au/resources/css/fonts/Router-Book.eot?#iefix") format("embedded-opentype"),      
-       url("http://myob.com.au/resources/css/fonts/Router-Book.ttf") format("truetype");
-           font-weight:normal;
-           font-style:normal; 
-           font-variant:normal;   
-      }
+  <!-- sort out IE -->
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 
-      body {
-        padding-top: 0px;
-      }
+  <link rel="canonical" href="http://developer.myob.com/" />
+  
+  <!-- stylesheets -->
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,400italic' rel='stylesheet' type='text/css'>
 
-
-      #header {
-        background:white;
-        border-bottom:1px solid #eee;
-        padding:5px 0;
-        margin:0 0 20px 0;
-        height: 75px;
-        }
-        #headerContent {
-            width:900px;
-            margin:0 auto;
-        }
-        #headerContent h1 a {
-            color:#424242;
-        }
-        #headerContent h1,
-        #headerContent p {
-            padding:0;
-            margin:0;
-        }
-        #headerContent p {
-            padding-top:10px;
-        }
-
-        /* MYOB THEME */
-#myob_sign_in {
-    margin-top: -3px;
-    float: right;
-}
-#myob_nav_bar {
-    position: absolute;
-    top: 60px;
-    left: 0px;
-
-    background: #5c247b;
-    width: 100%;
-    height: 45px;
-    line-height: 50px;
-
-    z-index: 1;
-    text-align: center;
+  <!-- scripts -->
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+  <style>
+body, h1, h2, h3 {
+  font-family: Ubuntu, arial, sans-serif;
+  font-weight: 300;
 }
 
-#myob_nav_bar ul {
-    text-align: left;
-    width: 900px;
-    margin: 0 auto;
-    padding: 0;
-}
-
-#myob_nav_bar li {
-    display: inline-block;
-    height: 43px;
-
-    background: url("http://myob.com.au/resources/images/new/nav_divide.png") left 12px no-repeat;
-    list-style: none;
-    margin: 0;
-    padding: 0 14px;
-
-}
-
-#myob_nav_bar li:nth-child(1){
-    padding-left: 0;
-    background: none;
-}
-
-#myob_nav_bar li a {
-    font-family: 'RouterBook', Arial, Helvetica, sans-serif;
-    font-size: 19px;
-    line-height: 21px;
-    font-weight: normal;
-    display: block;
-    color: white;
-    width: auto;
-    text-decoration: none;
-    margin: 10px 0 0 0;
-    padding: 0;
-}
-
-#myob_nav_bar li a:nth-child(1){
-    margin-left: 0;
-}
-
-#myob_nav_bar li a:hover {
-    background: #89009e;
-}
-
-.btn-purple {
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    background-color: #531e76;
-    background: linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
-    background: -o-linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
-    background: -moz-linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
-    background: -webkit-linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
-    background: -ms-linear-gradient(bottom, rgb(71,27,103) 7%, rgb(88,33,125) 50%);
-    background: -webkit-gradient(linear, left bottom, left top, color-stop(0.07, rgb(71,27,103)), color-stop(0.5, rgb(88,33,125)));
-    color: #fff;
-    display: inline-block;
-    font-family: RouterBook, Arial, Helvetica, sans-serif;
-    font-size: 1.3em;
-    padding: 8px 14px;
-    text-shadow: 0 -1px 1px #000; 
-    text-rendering: optimizeLegibility; 
-    cursor: pointer;
-  }
-
-a.sign-in {
-  margin-top: 10px;
-}
-a.sign-in:hover {
-    color: white;
-}
-
-a.sign-in span {
-    background: url("http://myob.com.au/resources/images/new/sprite_icons.png") 0 2px no-repeat;
-    padding-left: 23px;
-  }
-
-.button-style a:hover {
-    color: white;
-    text-decoration: none;
-}
-
-div#footer {
-    padding-top: 15px;
-    clear: both;
-    border-top: 1px solid;
-    border-color:  rgb(238, 238, 238);
-}
-
-#footer h3 {
+p {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  line-height: 28px;
   font-size: 18px;
-  line-height: 20px;
-  padding-bottom: 5px;
-  margin-bottom: 2px;
-  font-family: Arial,Helvetica,sans-serif;
-  color: #5C247B;
 }
 
-#footer p.copyright {
-  padding: 20px 0 20px 20px;
-  clear: both;
-  font-weight: normal;
+li {
+  line-height: 24px;
+  font-size: 16px;
 }
 
-#footer ul {
-    display: none;
-    font-weight: normal;
+/* side bar */
+#sidebar {
+  width: 330px;
+  position:fixed;
+  z-index:1;
+  padding: 10px;
 }
 
-.footerFour {
-    display: block;
-    margin-left: 30px;
-}
-
-#footer ul.footer-links {
+#sidebar .logoTop, #sidebar .quickLinks {
+  width: 300px;
+  margin: 0 auto;
+  text-align: left;
   display: block;
+  padding-top: 10px;
+}
+
+#sidebar h3 {
+  color: rgb(91, 192, 222);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgb(227, 227, 227);
+  font-size: 18px;
+  padding-top: 20px;
+}
+
+#sidebar .apiLogo img {
+  width: 300px;
+}
+
+#sidebar .btn {
+  min-width: 250px;
+  font-weight: 300;
+  text-align: left
+}
+
+#sidebar .logoBottom {
+  width: 300px;
+  margin: 0 auto;
+  text-align: left;
+  display: block;
+  margin-top: 125px;
+}
+
+#sidebar .logoBottom p {
+  margin-top: 10px;
+  padding-bottom: 20px;
+  font-size: 12px;
+  color: rgb(190, 190, 190);
+}
+
+/* Page Body */
+.col-lg-9 {
+  padding: 0;
+}
+
+#page {
+  position:relative;
+  margin-left: 350px;
+  border-left:1px solid rgb(227, 227, 227);
+  min-height: 900px;
+  padding-top: 75px;
+  padding-bottom: 75px;
+  z-index: 10;
+  background-color: rgb(255,255,255);
+}
+
+#page article {
   margin: 0;
   padding: 0;
 }
 
-#footer ul.footer-links li {
-  display: block;
-  font-size: 13px;
-  line-height: 20px;
-  margin: 0;
-  padding: 0 0 0 0;
+#page article pre {
+  border: none;
+  border-radius: 0;
+  margin-left: -30px;
+  padding: 25px 15px 25px 50px;
 }
 
-#footer ul.footer-links li a {
-  padding: 2px;
-  color: #333;
+#page .post {
+  padding: 30px;
+  max-width: 650px;
+  border-bottom: 1px solid rgb(227, 227, 227);
 }
 
-#footer ul.footer-links li a.muted {
-  padding: 2px;
-  color: #ccc;
+#page time {
+  margin: 10px 10px 0 0;
+  float: right;
 }
 
-#footer ul.footer-links li a:hover {
+#page .link {
+  margin: -1px 0;
+  padding: 30px;
+  background-color: rgb(246, 246, 246);
+}
+
+#page .photo {
+  padding: 30px;
+  max-width: 650px;
+}
+
+#page .photo img {
+  max-width: 600px;
+}
+
+#page .photo h2 {
+  font-size: 18px;
+}
+
+#page .quote {
+  margin: -1px 0;
+  padding: 30px;
+  background-image: linear-gradient(135deg, rgb(85, 85, 85) 0%, rgb(64, 64, 64) 100%);
+}
+
+#page .quote blockquote {
+  max-width: 600px;
+  color: rgb(223, 222, 224);
+  border-left-color: rgb(113, 168, 74);
+}
+
+#page .quote blockquote p {
+  line-height: 28px;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+#page .quote blockquote a {
+  color: rgb(113, 168, 74);
+}
+
+#page .quote p.source, #page .quote p.source a {
+  margin: -40px 0 0 0;
+  max-width: 550px;
+  font-size: 15px;
+  font-weight: 300;
   color: white;
-  background: rgb(92, 36, 123);
-  text-decoration: none;
+  text-align: right;
 }
 
-#footer ul li.footer-logo {
-    margin-bottom: 10px;
-}
-
-#footer ul li.footer-logo a:hover {
-  background: none;
-}
-
-#footer ul.footer-links li.icon {
-  padding-left: 20px; 
-  background-position: left;
-  background-repeat: no-repeat;
-  background-size: 16px 16px;
-}
-
-#footer ul.footer-links li.express {
-  background: url(http://developer.myob.com/files/glyphicons_150_edit.png) no-repeat;
-  background-size: 16px 16px;
-}
-
-#footer ul.footer-links li.doc {
-  background: url(http://developer.myob.com/files/glyphicons_039_notes.png) no-repeat;
-  background-size: 16px 16px;
-}
-#footer ul.footer-links li.explore {
-  background: url(http://developer.myob.com/files/glyphicons_027_search.png) no-repeat;
-  background-size: 16px 16px;
-}
-#footer ul.footer-links li.samples {
-  background: url(http://developer.myob.com/files/glyphicons_059_cargo.png) no-repeat;
-  background-size: 16px 16px;
-}
-#footer ul.footer-links li.twitter {
-  background: url(http://developer.myob.com/files/glyphicons_411_twitter.png) no-repeat;
-  background-size: 16px 16px;
-}
-#footer ul.footer-links li.instagram {
-  background: url(http://developer.myob.com/files/glyphicons_412_instagram.png) no-repeat;
-  background-size: 16px 16px;
-}
-
-#footer ul.footer-links li.biz {
-  background: url(http://developer.myob.com/files/glyphicons_089_building.png) no-repeat;
-}
-
-#footer ul.footer-links li.footer-logo {
-  margin-top: 10px;
-}
-    </style>
-  </head>
-  <body>
-    <div id='header'>
-    <div id='headerContent'>
-    <div id='myob_sign_in'>
-        <a href="http://my.myob.com/" class="btn-purple sign-in pull-right"><span>Sign in</span></a>
+  </style>
+</head>
+<body>
+<div class="colourBar"></div>
+<header id="sidebar" class="col-lg-3">
+  <div class="logoTop">
+    <h1><a href="http://developer.myob.com" class="apiLogo"><img src="http://myob-technology.github.io/myob_accountright_sample_nodejs/img/myobapi-logo.png" /></a></h1>
+    <blockquote>
+     C# Sample for AccountRight Live API
+    </blockquote>
+  </div>
+  <div class="quickLinks">
+    <h3>Project</h3>
+    <div class="btn-group-vertical">
+      <a href="https://github.com/MYOB-Technology/AccountRight_SampleApp_CSharp/zipball/master" type="button" class="btn btn-info">Download ZIP file</a>
+      <a href="https://github.com/MYOB-Technology/AccountRight_SampleApp_CSharp/tarball/master" type="button" class="btn btn-info">Download TAR Ball</a>
+      <a href="https://github.com/MYOB-Technology/AccountRight_SampleApp_CSharp" type="button" class="btn btn-info">View on GitHub</a>
     </div>
-        <h1><a href="http://developer.myob.com" class="logo" ><img src="http://www.myob.com.au/resources/images/new/logo_header.gif" alt="MYOB" width="100" height="34"></a></h1>
-    <div id='myob_nav_bar'>
-        <ul>
-            <li class=" "><a href="http://developer.myob.com/">Home</a></li>
-            <li class=" "><a href="http://developer.myob.com/docs">Documentation</a></li>
-            <li class="active"><a href="http://myobapi.tumblr.com">Blog</a></li>
-        </ul>
+    <h3>AccountRight Live API</h3>
+    <div class="btn-group-vertical">
+      <a href="http://developer.myob.com/api/accountright/api-overview/getting-started/" type="button" class="btn btn-info">Getting Started</a>
+      <a href="http://developer.myob.com/api/accountright/v2/" type="button" class="btn btn-info">v2 Documentation</a>
     </div>
+     <h3>MYOBapi Team</h3>
+    <div class="btn-group-vertical">
+      <a href="http://developer.myob.com/blog/" type="button" class="btn btn-info">Our Blog</a>
+      <a href="http://developer.myob.com/twitter/" type="button" class="btn btn-info">On Twitter</a>
+      <a href="http://developer.myob.com/instagram/" type="button" class="btn btn-info">On Instagram</a>
     </div>
-</div>
-    <div class="wrapper">
-      <header>
-        <h1>Accountright sampleapp csharp</h1>
+  </div>
+</header>
+<section id="page" class="col-lg-9">
+  <!-- begin article -->
+  <article id="[ID]" class="post">
+    <h1>C# Sample App</h1>
         <p>Example C# integration app with AccountRight Live API</p>
-
-        <p class="view"><a href="https://github.com/MYOB-Technology/AccountRight_SampleApp_CSharp">View the Project on GitHub <small>MYOB-Technology/AccountRight_SampleApp_CSharp</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/MYOB-Technology/AccountRight_SampleApp_CSharp/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/MYOB-Technology/AccountRight_SampleApp_CSharp/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/MYOB-Technology/AccountRight_SampleApp_CSharp">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h3>AccountRight API - C# Sample App</h3>
 
 <p>Bringing together C# and the AccountRight Live API, this app will allow you to get up to speed quickly with the API of AccountRight</p>
 
@@ -321,10 +226,10 @@ div#footer {
 <h3>Getting Started</h3>
 
 <p><strong>Network/Local</strong><br />
-If you have AccountRight API service installed on a target machine, you just need to connect it with your target API address. e.g. https://<machinename>:8080/AccountRight.</p>
+If you have AccountRight API service installed on a target machine, you just need to connect it with your target API address. e.g. <code>https://{machinename}:8080/AccountRight</code>.</p>
 
 <p><strong>Cloud</strong><br />
-You will need to register for a developer key from http://developer.myob.com/ and redirect uri set to : http://localhost:9000/LibraryBrowser/OAuthcallback.</p><p>Once you registered successfully, keep your client id and client secret for later OAuth authentication use.</p>
+You will need to register for a developer key from <a href="http://developer.myob.com/">http://developer.myob.com/</a> and redirect uri set to : <code>http://localhost:9000/LibraryBrowser/OAuthcallback</code>.</p><p>Once you registered successfully, keep your client id and client secret for later OAuth authentication use.</p>
 
 <p><strong>Sample code structure</strong><p>
   <ul>
@@ -333,46 +238,11 @@ You will need to register for a developer key from http://developer.myob.com/ an
     <li>CSharpSamples.Account.proj - A project that use the CSharpSamples.Common functionality to utilize the Account resource from the API </li>
     <li>CSharpSamples.JournalTransactions.proj - A project that use the CSharpSamples.Common functionality to utilize the JournalTransactions resource from the API</li>
     <li>CSharpSamples.All.proj - A project that consolidate all the project functionality.</li></ul>
+
+  </article>
+  <!-- end article -->
 </section>
-<div class='footer' id="footer">
-            
-            
-            
-            <div class="footerFour row">
-                <div class="footer-box footer-one span3">
-                    <h3>API</h3>
-                    <ul class="footer-links">
-                        <li class="icon express"><a href="http://developer.myob.com/register_for_the_myobapi">Register for our API</a></li>
-                        <li class="icon doc"><a href="http://developer.myob.com/docs">API Documentation</a></li>
-                        <li class="icon explore"><a href="" class="muted">API Explorer</a></li>
-                        <li class="icon samples"><a href="http://developer.myob.com/docs/read/resources/code_samples/">API Samples</a></li>
-                        <li class="icon blog"><a href="http://myobapi.tumblr.com">MYOBapi Blog</a></li>
-                        <li class="icon "><a href="http://www.myob.com">MYOB Corporate</a></li>
-                    </ul>
-                </div>
-                <div class="footer-box span3">
-                    <h3>Social</h3>
-                    <ul class="footer-links">
-                        <li class="icon twitter"><a href="http://www.twitter.com/myobapi">MYOBapi on Twitter</a></li>
-                        <li class="icon"><a href="http://www.twitter.com/">MYOB on Twitter</a></li>
-                        <li class="icon instagram"><a href="http://instagram.com/myobapi/">MYOBapi&nbsp;on&nbsp;Instagram</a></li>
-                        <li class="icon"><a href="" class="muted">MYOB on GitHub</a></li>
-                    </ul>
-                </div>
-                <div class="footer-box span3 pull-right">
-                    <ul class="footer-links">
-                        <li class="footer-logo"><a href="http://www.myob.com/"><img alt="MYOB" width="90"  src="http://developer.myob.com/files/logo_header.gif" /></a></li>
-                        <li><a href='http://myobapi.tumblr.com/rss'>RSS</a></li>
-                        <li><a href='/archive'>Archive</a></li>
-                        <li>Theme based on: <a href='http://www.tumblr.com/theme/6473'>Optimus</a></li>
-                    </ul>
-                </div>
-                <p class="copyright">Copyright © 2013 MYOB Technology Pty Ltd. All rights reserved.<br /><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-            </div><!-- four boxes -->            
-        </div>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    <script type="text/javascript">
+<script type="text/javascript">
 //<![CDATA[
 var _gaq = _gaq || [];
 var pluginUrl = (('https:' == document.location.protocol) ?
@@ -389,5 +259,62 @@ _gaq.push(['_trackPageview']);
 })();
 //]]>
 </script>
-  </body>
+</body>
 </html>
+<!--
+
+Still looking at the code? How about the MYOB API TEAM logo in ASCII art?
+
+                                                                                
+                                           MMMMM                                
+                                           MMMMM         MMM                    
+                                           MMMMMM       MMMMM                   
+                                 MM        MMMMMMM    MMMMMMM                   
+                               MMMMMM      MMMMMMMMMMMMMMMMM                    
+                                MMMMMMMMMMMMMMMMMMMMMMMMMMMM                    
+                                MMMMMMMMMMMMMMMMMMMMMMMMMMMM                    
+                                 MMMMMMMMMMMMMMMMMMMMMMMMMMMM    MMMM           
+                                  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM          
+                                  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM          
+                                 MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM            
+                         MMMMMMMMMMMMMMMMMMM        MMMMMMMMMMMMMM              
+                         MMMMMMMMMMMMMMMMMM           MMMMMMMMMMM               
+                          MMMMMMMMMMMMMMMM            MMMMMMMMMMM               
+                             MMMMMMMMMMMMM             MMMMMMMMMMM              
+                                MMMMMMMMMM             MMMMMMMMMMMMMMM          
+                                MMMMMMMMMMM           MMMMMMMMMMMMMMMMMM        
+                               MMMMMMMMMMMMM         MMMMMMMMMMMMMMMMMMM        
+                             MMMMMMMMMMMMMMMMM     MMMMMMMMMMMMMMMMMMMM         
+                            MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM                 
+                           MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM                  
+                            MMMMM   MMMMMMMMMMMMMMMMMMMMMMMMMMM                 
+                                      MMMMMMMMMMMMMMMMMMMMMMMMMM                
+                                     MMMMMMMMMMMMMMMMMMMMMMMMMMMM               
+                                     MMMMMMMMMMMMMMMMMM    MMMMMMM              
+                             MMM    MMMMMMM    MMMMMMM       MMMM               
+                 MMM        MMMMM   MMMMMM      MMMMMM                          
+                MMMMMM     MMMMMM   MMMM        MMMMMM                          
+                MMMMMMM   MMMMMMM                MMMMM                          
+                 MMMMMMMMMMMMMMMM                 M                             
+                 MMMMMMMMMMMMMMMMM   MMMMM                                      
+                 MMMMMMMMMMMMMMMMMMMMMMMMMM                                     
+         MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM                                     
+        MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM                                       
+        MMMMMMMMMMMMMMMM     MMMMMMMMMM                                         
+           MMMMMMMMMMMM       MMMMMMMM                                          
+              MMMMMMMM        MMMMMMMM                                          
+              MMMMMMMMM       MMMMMMMMMMM                                       
+              MMMMMMMMMM     MMMMMMMMMMMMMMM                                    
+            MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM                                    
+          MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM                                    
+         MMMMMMMMMMMMMMMMMMMMMMMMMMM                                            
+          MMMMM   MMMMMMMMMMMMMMMMM                                             
+                    MMMMMMMMMMMMMMMM                                            
+                    MMMMMM   MMMMMMM                                            
+                   MMMMMM      MMMMMM                                           
+                   MMMMM        MMMM                                            
+                    MMMM 
+
+Go on - hit us up @MYOBapi and let us know you found our hidden logo :)
+
+-->
