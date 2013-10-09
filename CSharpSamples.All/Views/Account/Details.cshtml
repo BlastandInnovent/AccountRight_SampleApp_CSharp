@@ -1,0 +1,406 @@
+﻿@{//  File:        Details.cshtml
+//  Copyright:   Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+//  Website:     http://www.myob.com
+//  Author:      MYOB
+//  E-mail:      info@myob.com
+//
+//Documentation, code and sample applications provided by MYOB Australia are for 
+//information purposes only. MYOB Technology Pty Ltd and its suppliers make no 
+//warranties, either express or implied, in this document. 
+//
+//Information in this document or code, including website references, is subject
+//to change without notice. Unless otherwise noted, the example companies, 
+//organisations, products, domain names, email addresses, people, places, and 
+//events are fictitious. 
+//
+//The entire risk of the use of this documentation or code remains with the user. 
+//Complying with all applicable copyright laws is the responsibility of the user. 
+//
+//Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+}
+@using CSharpSamples.Common.Helpers
+@using CSharpSamples.Common.Utilities
+@{
+    ViewBag.Title = "Account";
+}
+
+@model MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger.Account
+
+<legend>@ViewBag.Title  <a href='@Url.Action("Index")' class="btn"><i class="icon-list"></i> List</a>
+    <span class="label label-info">level @Model.Level</span>
+@*    @if (Model.IsActive)
+    {
+        <span class="label label-success">Active</span>
+    }
+    else
+    {
+        <span class="label">Inactive</span>
+    }*@
+
+</legend>
+
+<div id="accountDetail" class="row-fluid">
+    <div class="form-horizontal span6">
+        @Html.HiddenFor(m => m.UID)
+        @Html.HiddenFor(m => m.RowVersion)
+                
+        <div class="control-group">
+            <label class="control-label" for="AccountType">Account Type</label>
+            <div class="controls">
+                @Html.TextBoxFor(m => m.Classification, new { @Value = Model.Classification.ToString().AddSpacesToSentence(), @id = "Classification", @readonly = "readonly" }) 
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="SubType">Sub Type</label>
+            <div class="controls">
+                <div class="input-append">
+                    @Html.TextBoxFor(m => m.Type, new { @Value = Model.Type.ToString().AddSpacesToSentence(), @id = "AccountType", @name = "Type", @class="span10" })
+                    <button class="btn" id="btnSubAccountType"><i class="icon-chevron-down"></i></button>
+                </div>
+                @Html.HiddenFor(m => m.Type)
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="AccountNumber">Account Number</label>
+            <div class="controls">
+                <div class="input-prepend">
+                    <span class="add-on" id="accountNoPrefix">@Model.Classification.GetAccountNumberPrefix()</span>@Html.TextBoxFor(m => m.Number, new { @class = "span12 accountnumber" })
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="AccountName">Account Name</label>
+            <div class="controls">
+                @Html.EditorFor(m => m.Name)
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label" for="OpeningAccountBalance">Opening</label>
+            <div class="controls">
+                @Html.TextBoxFor(m => m.OpeningBalance, new { @class = "currency", @style = "text-align:right" })
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="CurrentAccountBalance">Current</label>
+            <div class="controls">
+                @Html.TextBoxFor(m => m.CurrentBalance, new { @class = "currency", @readonly = "readonly", @style = "text-align:right" })
+            </div>
+        </div>
+    </div>
+    <div class="form-horizontal span6">
+        <div class="control-group">
+            <label class="control-label" for="isHeaderOption"></label>
+            <div class="controls">
+                <div class="btn-group" id="isHeaderOption" data-toggle="buttons-radio">
+                    <button type="button" class="btn" value="True" style="width:110px">Header</button>
+                    <button type="button" class="btn" value="False" style="width:110px">Detail</button>
+                </div>
+            </div>
+        </div>
+
+         <div class="control-group">
+            <label class="control-label" for="isActiveOption">Active</label>
+            <div class="controls">
+                <div class="btn-group" id="isActiveOption" data-toggle="buttons-radio">
+                    <button type="button" class="btn" value="False" style="width:110px" >Yes</button>
+                    <button type="button" class="btn" value="True" style="width:110px">No</button>
+                </div>
+            </div>
+        </div>
+        
+        @*<div class="control-group">
+            <label class="control-label" for="AccountLevel">Account Level</label>
+            <div class="controls">
+                @Html.TextBoxFor(m => m.AccountLevel, new { @readonly = "readonly", @style = "text-align:right" })
+            </div>
+        </div>*@
+
+        <div class="control-group">
+            <label class="control-label" for="AccountDescription">Description</label>
+            <div class="controls">
+                @Html.TextAreaFor(m => m.Description, new { @rows = "4" })
+            </div>
+        </div>   
+        
+        <div class="control-group">
+            <label class="control-label" for="TaxCode">Tax Code</label>
+            <div class="controls" id="TaxCodeDetails">
+                @Html.HiddenFor(m => m.TaxCode.UID)
+                @Html.EditorFor(m => m.TaxCode.Code)
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label" for="Currency">Currency</label>
+            <div class="controls">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<div class="accordion" id="bankingDetails">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#bankingDetails" href="#bankingDetailsContent">
+                <strong>Banking Details</strong>
+            </a>
+        </div>
+        <div id="bankingDetailsContent" class="accordion-body collapse in">
+            <div class="accordion-inner">
+              
+                <div class="row-fluid">
+                  
+                    <div class="form-horizontal span6">
+                        <div class="control-group">
+                            <label class="control-label" for="BankingDetails.BankAccountNumber">Bank Account Number</label>
+                            <div class="controls">
+                                @Html.EditorFor(m => m.BankingDetails.BankAccountNumber)
+                            </div>
+                        </div>
+              
+                        <div class="control-group">
+                            <label class="control-label" for="BankingDetails.BankAccountName">Bank Account Name</label>
+                            <div class="controls">
+                                @Html.EditorFor(m => m.BankingDetails.BankAccountName)
+                            </div>
+                        </div>
+              
+                        <div class="control-group">
+                            <label class="control-label" for="BankingDetails.CompanyTradingName">Trading Name</label>
+                            <div class="controls">
+                                @Html.EditorFor(m => m.BankingDetails.CompanyTradingName)
+                            </div>
+                        </div>
+                      
+                      
+                        <div class="control-group">
+                            <label class="control-label" for="isCreateBankFileOption">Create BankFile</label>
+                            <div class="controls">
+                                <div class="btn-group" id="isCreateBankFileOption" data-toggle="buttons-radio">
+                                    <button type="button" class="btn" value="True" style="width:110px">Yes</button>
+                                    <button type="button" class="btn" value="False" style="width:110px">No</button>
+                                </div>
+                            </div>
+                        </div>
+                      
+                        <div class="control-group">
+                            <label class="control-label" for="isSelfBalancingOption">Self Balancing</label>
+                            <div class="controls">
+                                <div class="btn-group" id="isSelfBalancingOption" data-toggle="buttons-radio">
+                                    <button type="button" class="btn" value="True" style="width:110px">Yes</button>
+                                    <button type="button" class="btn" value="False" style="width:110px">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  
+                    <div class="form-horizontal span6">
+                        <div class="control-group">
+                            <label class="control-label" for="BankingDetails.DirectEntryUserId">Bank Code</label>
+                            <div class="controls">
+                                @Html.EditorFor(m => m.BankingDetails.BankCode)
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="BankingDetails.DirectEntryUserId">Direct Entry UserId</label>
+                            <div class="controls">
+                                @Html.EditorFor(m => m.BankingDetails.DirectEntryUserId)
+                            </div>
+                        </div>
+              
+                        <div class="control-group">
+                            <label class="control-label" for="BankingDetails.StatementCode">Statement Code</label>
+                            <div class="controls">
+                                @Html.EditorFor(m => m.BankingDetails.StatementCode)
+                            </div>
+                        </div>
+              
+              
+                        <div class="control-group">
+                            <label class="control-label" for="BankingDetails.StatementReference">Reference</label>
+                            <div class="controls">
+                                @Html.EditorFor(m => m.BankingDetails.StatementReference)
+                            </div>
+                        </div>
+              
+                        <div class="control-group">
+                            <label class="control-label" for="BankingDetails.StatementParticulars">Particulars</label>
+                            <div class="controls">
+                                @Html.EditorFor(m => m.BankingDetails.StatementParticulars)
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<button type="button" class="btn btn-primary" value="Save" id="btnSave">Save   <i class="icon-download-alt"></i></button>
+<button id="btnDeleteJournal" type="button" class="btn btn-warning" value="Delete">Delete <i class="icon-trash"></i></button>
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.formatCurrency-1.4.0.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.mask.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Account.js")"></script>
+<script>
+    
+    $(function () {
+        $("#isActiveOption").find("button").each(function () {
+            if ($(this).val() == '@Model.IsActive') {
+                $(this).addClass('active');
+            }
+        });
+
+        $("#isHeaderOption").find("button").each(function () {
+            if ($(this).val() == '@Model.IsHeader') {
+                $(this).addClass('active');
+            }
+        });
+
+        $("#isCreateBankFileOption").find("button").each(function () {
+            if ($(this).val() == '@Model.BankingDetails.CreateBankFiles') {
+                $(this).addClass('active');
+            }
+        });
+
+        $("#isSelfBalancingOption").find("button").each(function () {
+            if ($(this).val() == '@Model.BankingDetails.IncludeSelfBalancingTransaction') {
+                $(this).addClass('active');
+            }
+        });
+
+
+        var subTypes = JSON.parse('@Html.Raw(ViewBag.SubTypes)');
+
+        $("#Type").autocomplete({
+            minLength: 0,
+            source: subTypes,
+            focus: function (event, ui) {
+                $("#SubType").val(ui.item.SubType);
+                return false;
+            },
+            select: function (event, ui) {
+                $("#SubType").val(ui.item.SubType);
+                $("#Type").val(ui.item.SubTypeText);
+                $("#accountNoPrefix").text(wtf(ui.item.AccountTypePrefix));
+                $("#Classification").val(ui.item.AccountTypeText);
+                return false;
+            }
+        })
+        .data("autocomplete")._renderItem = function (ul, item) {
+            return $("<li>")
+                .data("item.autocomplete", item)
+                .append("<a class='thumbnail'>" + item.SubTypeText + "</a>")
+                .appendTo(ul);
+        };
+
+
+        $(".accountnumber").trigger("blur");
+        $(".currency").trigger("blur");
+    });
+
+    $(".currency").live("blur", function () {
+        $(this).formatCurrency();
+    });
+    $(".accountnumber").live("blur", function () {
+        $(this).mask('0000');
+    });
+    $("#btnSave").unbind('click');
+    $("#btnSave").click(function (event) {
+        event.preventDefault();
+        var bankingDetails = $("#bankingDetailsContent").map(function () {
+            return {
+                BankAccountNumber: $(this).find("input[name='BankingDetails.BankAccountNumber']").first().val(),
+                BankAccountName: $(this).find("input[name='BankingDetails.BankAccountName']").first().val(),
+                CompanyTradingName: $(this).find("input[name='BankingDetails.CompanyTradingName']").first().val(),
+                CreateBankFile: $("#isCreateBankFileOption > button.active").val(),
+                IncludeSelfBalancingTransaction: $("#isSelfBalancingOption > button.active").val(),
+                BankCode: $(this).find("input[name='BankingDetails.BankCode']").first().val(),
+                DirectEntryUserId: $(this).find("input[name='BankingDetails.DirectEntryUserId']").first().val(),
+                StatementCode: $(this).find("input[name='BankingDetails.StatementCode']").first().val(),
+                StatementReference: $(this).find("input[name='BankingDetails.StatementReference']").first().val(),
+                StatementParticulars: $(this).find("input[name='BankingDetails.StatementParticulars']").first().val()
+            };
+        }).get(0);
+
+        var tax = $("#TaxCodeDetails").map(function () {
+            return {
+                UID: $(this).find("input[name='TaxCode.UID']").first().val(),
+                Code: $(this).find("input[name='TaxCode.Code']").first().val(),
+            };
+        }).get(0);
+
+        var account = $("#accountDetail").map(function () {
+            return {
+                RowVersion: $(this).find("input[name='RowVersion']").first().val(),
+                UID: $(this).find("input[name='UID']").first().val(),
+                Number: $(this).find("input[name='Number']").first().val(),
+                Name: $(this).find("input[name='Name']").first().val(),
+                Description: $(this).find("textarea[name='AccountDescription']").first().val(),
+                ParentAccountId: "",
+                IsActive: $("#isActiveOption > button.active").val(),
+                IsHeader: $("#isHeaderOption > button.active").val(),
+                //TaxCode: $(this).find("input[name='TaxCode.Code']").first().val(),             
+                TaxCode: tax,
+                Level: $(this).find("input[name='Level']").first().val(),
+                Classification: $("#accountNoPrefix").text(),
+                Type: $(this).find("input[id='Type']").first().val(),
+                OpeningBalance: $(this).find("input[name='OpeningBalance']").first().asNumber().toString(),
+                CurrentBalance: $(this).find("input[name='CurrentBalance']").first().asNumber().toString(),
+                BankingDetails: bankingDetails
+            };
+        }).get(0);
+
+        var urlSave = '@Url.Action("SaveAccount", "Account")';
+
+        $.ajax({
+            type: 'POST',
+            url: urlSave,
+            dataType: 'json',
+            data: JSON.stringify(account),
+            contentType: 'application/json; charset=utf-8'
+
+        }).done(function (data) {
+            if (data.ok == false) {
+                showMessageBox("Account", data.message);
+            } else {
+                showMessageBox("Account", "Record saved!", recordSavedSuccess);
+            }
+        });
+
+        return false;
+    });
+
+    function recordSavedSuccess() {
+        window.location = '@Url.Action("Index", "Account")';
+    }
+    
+    function wtf(v) {
+        alert(v);
+        return v;
+    }
+
+    $("#btnSubAccountType").unbind("click");
+    $("#btnSubAccountType").click(function (event) {
+        if ($("input#Type").autocomplete("widget").is(":visible")) {
+            $("input#Type").autocomplete("close");
+            return;
+        }
+
+        $(this).blur();
+        $("input#Type").autocomplete('search', '');
+        $("input#Type").focus();
+    });
+
+    $("#btnDeleteJournal").unbind("click");
+    $("#btnDeleteJournal").click(function (event) {
+        deleteAccount('@Model.UID', '@Model.Number @Model.Name', '@Url.Action("DeleteAccount")', '@Url.Action("Index")');
+    });
+</script>

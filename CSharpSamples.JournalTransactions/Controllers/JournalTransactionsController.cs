@@ -21,26 +21,19 @@ using System;
 using System.Linq;
 using System.Web.Mvc;
 using CSharpSamples.Common;
-using CSharpSamples.JournalTransactions.Models;
 using System.Collections.Generic;
 using CSharpSamples.Common.Helpers;
+using MYOB.AccountRight.SDK.Services.GeneralLedger;
+using GL = MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger;
 
 namespace CSharpSamples.JournalTransactions.Controllers
 {
     [HandleError]
-    public class JournalTransactionsController : BusinessController<JournalTransactionModel>
-    {        
-        protected override string Module
-        {
-            get
-            {
-                return "JournalTransaction";
-            }
-        }
-
+    public class JournalTransactionsController : ReadableBusinessController<GL.JournalTransaction, JournalTransactionService>
+    {   
         public ActionResult Index()
         {
-            ViewBag.JournalTypes = new SelectList(EnumHelper.GetEnumList(typeof(JournalType), (value, name) => name.AddSpacesToSentence()), "key", "value", JournalType.General.GetHashCode());
+            ViewBag.JournalTypes = new SelectList(EnumHelper.GetEnumList(typeof(GL.JournalType), (value, name) => name.AddSpacesToSentence()), "key", "value", GL.JournalType.General.GetHashCode());
             return View();
         }
 
@@ -54,23 +47,17 @@ namespace CSharpSamples.JournalTransactions.Controllers
             return PartialView(journal);
         }
 
-        public JsonResult Search(string field, string searchText, JournalType journalType, SortDescription sort, int? pageCount)
+        public JsonResult Search(string field, string searchText, GL.JournalType journalType, SortDescription sort, int? pageCount)
         {
-            if ((string.IsNullOrEmpty(searchText) || string.IsNullOrEmpty(field)) 
-                && journalType == JournalType.All 
-                && (sort==null || string.IsNullOrEmpty(sort.Field)))
-                return Json(GetAll(pageCount));
-
-            var searchCriteria = new List<SearchCriteria>();
-
-            if (journalType != JournalType.All)
-                searchCriteria.Add(new SearchCriteria
+            var searchCriteria = new List<SearchCriteria>
                 {
-                    Field = "JournalType",
-                    SearchText = journalType.GetHashCode().ToString(),
-                    FieldType = typeof(int)
-                });
-
+                    new SearchCriteria
+                        {
+                            Field = "JournalType",
+                            SearchText = journalType.GetHashCode().ToString(),
+                            FieldType = typeof (int)
+                        }
+                };
 
             if (!string.IsNullOrEmpty(searchText) && !string.IsNullOrEmpty(field))
             {

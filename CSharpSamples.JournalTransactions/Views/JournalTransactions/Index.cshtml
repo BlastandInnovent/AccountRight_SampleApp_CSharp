@@ -30,7 +30,7 @@
             <div class="form-inline" style="margin: 10px;">
                 <div class="control-group">
                     <select id="field" name="field">
-                        <option value="Id">Number</option>
+                        <option value="DisplayID">Number</option>
                         <option value="Description">Description</option>
                         <option value="DateOccurred">Date Occurred</option>
                         <option value="DatePosted">Date Posted</option>
@@ -123,7 +123,7 @@ $(function () {
         });
         
         $("#lnkOrderByNumber").click(function (event) {
-            orderBy('Id');
+            orderBy('DisplayID');
         });
         $("#lnkOrderByDescription").click(function (event) {
             orderBy('Description');
@@ -179,14 +179,14 @@ $(function () {
             journalIds.length = 0; //clear the array
             $.each(journals, function (i, journal) {
                 var journalRow = '<tr>'
-                    + '<td><a name="lnkId" href="#">' + journal.Id + '</a></td>'
+                    + '<td><a name="lnkId" href="#" title="'+ journal.UID +'">' + journal.DisplayID + '</a></td>'
                     + '<td>' + isNull(journal.Description, "") + '</td>'
                     + '<td>' + formatJsonDate(journal.DateOccurred) + '</td>'
                     + '<td>' + formatJsonDate(journal.DatePosted) + '</td>'
-                    + '<td>' + journal.JournalTypeDisplay + '</td>'
+                    + '<td>' + journal.JournalType + '</td>'
                     + '</tr>';
                 $(journalRow).appendTo("#journalList");
-                journalIds.push(journal.Id);
+                journalIds.push(journal.UID);
             });
 
             $('#journalList').accordion({
@@ -199,7 +199,7 @@ $(function () {
         }
 
         $(document).on('click', 'a[name="lnkId"]', function (event) {
-            goDetails($(this).text());
+            goDetails($(this).attr("title"));
         });
 
         var journalIds = [];

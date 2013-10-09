@@ -19,20 +19,23 @@
 //Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
 using System.Web.Mvc;
 using CSharpSamples.Common.Models;
+using MYOB.AccountRight.SDK.Contracts;
+using MYOB.AccountRight.SDK;
 
 namespace CSharpSamples.Common
 {
     public interface IBusinessController
     {
         OAuthInfo OAuthInformation { get; }
-        string CloudApi { get; set; }
-        string NetworkApi { get; set; }
+        IApiConfiguration APIConfiguration { get; }
+        string CloudApi { get; }
+        string NetworkApi { get; }
         bool IsLogon { get; }
-        CompanyModel CompanyFile { get; }
+        CompanyFile CompanyFile { get; }
         string CurrentUser { get; }
         string LoginInfo { get; }
         string LoginInfoTitle { get; }
-        JsonResult CompanyLogon(CompanyModel companyFile, string userId, string password);
+        JsonResult CompanyLogon(CompanyFile companyFile, string userId, string password);
         JsonResult CompanyLogOut();
     }
 }

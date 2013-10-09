@@ -18,9 +18,13 @@
 //
 //Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
 using System;
+using System.Web;
 using System.Web.Mvc;
 using System.IO;
 using System.Net;
+using MYOB.AccountRight.SDK;
+using MYOB.AccountRight.SDK.Contracts;
+using MYOB.AccountRight.SDK.Services;
 using Newtonsoft.Json;
 using System.Text;
 using CSharpSamples.Common.Exceptions;
@@ -29,6 +33,7 @@ using CSharpSamples.Common.Helpers;
 using System.Collections.Generic;
 using CSharpSamples.Common.Context;
 using System.Configuration;
+
 
 namespace CSharpSamples.Common
 {
@@ -39,14 +44,122 @@ namespace CSharpSamples.Common
             public bool ok { get; set; }
             public string message { get; set; }
         }
-        public JsonResult CompanyLogon(CompanyModel companyFile, string userId, string password)
+
+
+        public IApiConfiguration APIConfiguration 
+        { 
+            get {
+                var apiconfiguration = Session["APIConfiguration"] as IApiConfiguration ??
+                                       new ApiConfiguration(OAuthInformation.Key, OAuthInformation.Secret, OAuthInformation.RedirectUri);
+
+                return apiconfiguration;   
+            }
+            set { Session["APIConfiguration"] = value; }
+        }
+
+        public bool IsLogon
+        {
+            get
+            {
+                return CompanyFileResource != null;
+            }
+        }
+        public CompanyFile CompanyFile
+        {
+            get
+            {
+                if (CompanyFileResource == null) return null;
+
+                return CompanyFileResource.CompanyFile;
+            }
+
+        }
+        public string CurrentUser
+        {
+            get
+            {
+                if (CompanyCredential == null) return string.Empty;
+                return CompanyCredential.Username;
+            }
+        }
+        public string LoginInfo
+        {
+            get
+            {
+                if (CompanyFile == null) return string.Empty;
+
+                return "<small>"
+                     + "Name: " + CompanyFile.Name
+                     + "<br />Version: " + CompanyFile.ProductVersion
+                     + "<br />Path:" + CompanyFile.LibraryPath
+                     + "<br />User:" + CurrentUser
+                     + "<br />Server:" + (APIConfiguration.ApiBaseUrl)
+                     + "</small>";
+            }
+        }
+        public string LoginInfoTitle
+        {
+            get
+            {
+                if (CompanyFile == null) return string.Empty;
+
+                return "<small>"
+                    + "Connected to " + (string.IsNullOrEmpty(APIConfiguration.ClientId) ? "Network" : "Cloud")
+                     + "</small>";
+            }
+        }
+
+        public string CloudApi
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(APIConfiguration.ClientId) ? "" : APIConfiguration.ApiBaseUrl);
+            }
+            internal set
+            {
+
+            }
+        }
+        public string NetworkApi
+        {
+            get
+            {
+                return (!string.IsNullOrEmpty(APIConfiguration.ClientId) ? APIConfiguration.ApiBaseUrl : "");
+            }
+            internal set
+            {
+
+            }
+        }
+
+        public CompanyFileWithResources CompanyFileResource
+        {
+            get { return Session["CompanyFileResources"] as CompanyFileWithResources; }
+            set { Session["CompanyFileResources"] = value; }
+        }
+        protected CompanyFileCredentials CompanyCredential
+        {
+            get { return Session["CompanyFileCredentials"] as CompanyFileCredentials; }
+            set { Session["CompanyFileCredentials"] = value; }
+        }
+
+        protected IOAuthKeyService KeyService
+        {
+            get
+            {
+                var keyService = Session["KeyService"] as IOAuthKeyService ?? new SimpleOAuthKeyService();
+
+                return keyService;
+            }
+            set { Session["KeyService"] = value; }
+        }
+
+
+        public JsonResult CompanyLogon(CompanyFile companyFile, string userId, string password)
         {
             try
-            {
-                var context = new CompanyFileContext(OAuthInformation);
-                context.Login(companyFile, userId, password);
-
-                Context = context;
+            {                                
+                Login(companyFile, userId, password);
             }
             catch (Exception ex)
             {
@@ -56,9 +169,20 @@ namespace CSharpSamples.Common
             return Json(new LogonResult { ok = true });
         }
 
+        internal CompanyFileWithResources Login(CompanyFile companyFile, string userId, string password)
+        {
+            var _login = new LoginContext { Username = userId, Password = password };
+
+            var _service = new CompanyFileService(APIConfiguration, null, KeyService);
+            CompanyFileResource = _service.Get(companyFile, _login);
+            CompanyCredential = new CompanyFileCredentials(userId, password); 
+            return CompanyFileResource;
+        }
+
         public JsonResult CompanyLogOut()
         {
-            Context = null;
+            CompanyFileResource = null;
+            CompanyCredential = null; 
             return Json(new LogonResult { ok = true });
         }
 
@@ -77,15 +201,27 @@ namespace CSharpSamples.Common
                 Secret = secret,
                 RedirectUri = redirectUri,
                 Scope = scope
-            };
-
-            CloudApi = cloudApi;
+            };            
         }
 
         public ActionResult OAuthCallback()
         {
-            OAuthInformation.RequestAccessToken();
+            var requestUri = HttpContextFactory.Current.Request.Url;
+            var queries = HttpUtility.ParseQueryString(requestUri.Query);
+            var code = queries["code"];
 
+            var service = new OAuthService(APIConfiguration);
+            var oauthToken = service.GetTokens(code);
+            KeyService = new SimpleOAuthKeyService() {OAuthResponse = oauthToken}; 
+            
+
+            if (OAuthInformation.Token == null) 
+                OAuthInformation.Token = new OAuthToken();
+            OAuthInformation.Token.AccessToken = KeyService.OAuthResponse.AccessToken;
+            OAuthInformation.Token.RefreshToken = KeyService.OAuthResponse.RefreshToken;
+            OAuthInformation.Token.ExpiresIn = KeyService.OAuthResponse.ExpiresIn; 
+            //OAuthInformation.RequestAccessToken();
+            
             return RedirectToAction("Index", "CommandCentre");
         }
 
@@ -93,67 +229,15 @@ namespace CSharpSamples.Common
         {
             return Json(OAuthInformation.RefreshToken());
         }
-
-
         
-        protected ApiContext ApiContext
-        {
-            get
-            {
-                return new ApiContext(OAuthInformation);
-            }
-        }
-
-        protected CompanyFileContext Context
-        {
-            get
-            {
-                return HttpContextFactory.Current.Session["CompanyFileContext"] as CompanyFileContext;
-            }
-            private set
-            {
-                HttpContextFactory.Current.Session["CompanyFileContext"] = value;
-            }
-        }
-        public string CloudApi
-        {
-            get
-            {
-                var apiUrl = HttpContextFactory.Current.Session["CloudWebApi"] as string;
-
-                if (string.IsNullOrEmpty(apiUrl))
-                {
-                    apiUrl = ConfigurationManager.AppSettings["cloudApiUrl"];
-                    HttpContextFactory.Current.Session["CloudWebApi"] = apiUrl;
-                }
-
-                return apiUrl;
-            }
-            set
-            {
-                HttpContextFactory.Current.Session["CloudWebApi"] = value;
-            }
-        }
-        public string NetworkApi
-        {
-            get
-            {
-                var apiUrl = HttpContextFactory.Current.Session["NetworkWebApi"] as string;
-
-                if (string.IsNullOrEmpty(apiUrl))
-                {
-                    apiUrl = ConfigurationManager.AppSettings["networkApiUrl"];
-                    HttpContextFactory.Current.Session["NetworkWebApi"] = apiUrl;
-                }
-
-                return apiUrl;
-            }
-            set
-            {
-                HttpContextFactory.Current.Session["NetworkWebApi"] = value;
-            }
-        }
-
+        //protected ApiContext ApiContext
+        //{
+        //    get
+        //    {
+        //        return new ApiContext(OAuthInformation);
+        //    }
+        //}
+        
         public OAuthInfo OAuthInformation
         {
             get

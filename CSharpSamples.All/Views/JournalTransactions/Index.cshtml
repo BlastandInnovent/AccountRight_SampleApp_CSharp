@@ -1,0 +1,242 @@
+﻿@{//  File:        Index.cshtml
+//  Copyright:   Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+//  Website:     http://www.myob.com
+//  Author:      MYOB
+//  E-mail:      info@myob.com
+//
+//Documentation, code and sample applications provided by MYOB Australia are for 
+//information purposes only. MYOB Technology Pty Ltd and its suppliers make no 
+//warranties, either express or implied, in this document. 
+//
+//Information in this document or code, including website references, is subject
+//to change without notice. Unless otherwise noted, the example companies, 
+//organisations, products, domain names, email addresses, people, places, and 
+//events are fictitious. 
+//
+//The entire risk of the use of this documentation or code remains with the user. 
+//Complying with all applicable copyright laws is the responsibility of the user. 
+//
+//Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+}
+@using CSharpSamples.Common.Helpers
+@{
+    ViewBag.Title = "Journal Transactions";
+}
+
+<legend>Journal Transactions</legend>
+<div class="accordion" id="journalTransactionFilter">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <div class="form-inline" style="margin: 10px;">
+                <div class="control-group">
+                    <select id="field" name="field">
+                        <option value="DisplayID">Number</option>
+                        <option value="Description">Description</option>
+                        <option value="DateOccurred">Date Occurred</option>
+                        <option value="DatePosted">Date Posted</option>
+                    </select>
+                    <div id="searchFields" class="input-append">
+                        <input type="text" id="search" name="search" placeholder="Search"/>
+                        <button type="button" id="btnSearchJournal" value="Search" class="btn"><i class="icon-search"></i></button>
+                    </div>
+                    <button type="button" id="btnResetSearchJournal" value="Reset" class="btn"><i class="icon-remove"></i></button>
+                </div>
+                
+                @Html.ToggleButtons("cboJournalType", (IEnumerable<SelectListItem>)ViewBag.JournalTypes)
+            </div>
+        </div>
+    </div>
+</div>
+
+<table id="journalList" class="table table-hover">
+    <thead class="well well-small">
+        <tr>
+            <th><a href="#" id="lnkOrderByNumber">Number</a></th>
+            <th><a href="#" id="lnkOrderByDescription">Description</a></th>
+            <th><a href="#" id="lnkOrderByDateOccurred">Date Occurred</a></th>
+            <th><a href="#" id="lnkOrderByDatePosted">Date Posted</a></th>
+            <th><a href="#" id="lnkOrderByJournalType">Type</a></th>
+        </tr>
+    </thead>
+</table>
+
+<div id="journalDetails" class="modal hide fade" style="width: 700px;margin: -300px 0 0 -280px;">
+    <div class="modal-header"></div>
+    <div class="modal-body" style="max-height:900px"></div>
+    <div class="modal-footer">
+        <button class="btn" id="btnPrevJournal"><i class="icon-step-backward"></i> Prev</button>
+    <button class="btn" id="btnNextJournal">Next <i class="icon-step-forward"></i></button>
+    </div>
+</div>
+<script>
+$(function () {
+        if ('@((ViewContext.Controller as CSharpSamples.Common.IBusinessController).IsLogon)' == 'True') {
+            searchJournal();
+        }
+        var currentDetailId = 0;
+
+        $("#btnPrevJournal").click(function (event) {
+            var prevId = getPrevJournalId();
+            goDetails(prevId);
+        });
+        $("#btnNextJournal").click(function (event) {
+            var nextId = getNextJournalId();
+            goDetails(nextId);
+        });
+        $('#cboJournalType > button').click(function (event) {
+            searchJournal($(this).val());
+        });
+        $("#btnSearchJournal").click(function (event) {
+            event.preventDefault();
+            searchJournal();
+            return false;
+        });
+        $("#btnResetSearchJournal").click(function (event) {
+            event.preventDefault();
+            $("#search").val('');
+            $("#cboJournalType").find("button").each(function () {
+                $(this).removeClass('active');
+                if ($(this).val() == '0') {
+                    $(this).addClass('active');
+                }
+            });
+            searchJournal();
+            return false;
+        })
+
+        $("#field").change(function (event) {
+            switch ($(this).val()) {
+                case "DateOccurred":
+                    $('#search').get(0).type = 'text';
+                    $("#search").datepicker({ dateFormat: "yy-mm-dd", showAnim: "slideDown", showButtonPanel: true });
+                    break;
+                case "DatePosted":
+                    $('#search').get(0).type = 'text';
+                    $("#search").datepicker({ dateFormat: "yy-mm-dd", showAnim: "slideDown", showButtonPanel: true });
+                    break;
+                default:
+                    $('#search').get(0).type = 'text';
+                    $("#search").datepicker('destroy');
+                    break;
+            }
+
+        });
+        
+        $("#lnkOrderByNumber").click(function (event) {
+            orderBy('DisplayID');
+        });
+        $("#lnkOrderByDescription").click(function (event) {
+            orderBy('Description');
+        });
+        $("#lnkOrderByDateOccurred").click(function (event) {
+            orderBy('DateOccurred');
+        });
+        $("#lnkOrderByDatePosted").click(function (event) {
+            orderBy('DatePosted');
+        });
+        $("#lnkOrderByJournalType").click(function (event) {
+            orderBy('JournalType');
+        });
+
+
+        var orderDirection = 'desc';
+        var orderField = "DatePosted";
+        function orderBy(field) {
+            orderDirection = orderDirection == 'asc' ? 'desc' : 'asc';
+            orderField = field;
+            searchJournal();
+        }
+
+        function searchJournal(journalType) {
+            var search = $("#search").val();
+            $.ajax(
+            {
+                type: 'POST',
+                url: "@Url.Action("Search")",
+                contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            data: JSON.stringify({
+                field: $("#field").val(),
+                searchText: search,
+                journalType: journalType ? journalType : $("#cboJournalType > button.active").val(),
+                sort: { Field: orderField, Direction: orderDirection },
+                pageCount: defaultPageCount
+            })
+        }
+            ).done(function (data) {
+                if (data.ok == false) {
+                    showMessageBox(data.message);
+                } else {
+                    applyPager($("#journalList"), data, "@Url.Action("GetPrevPage")", "@Url.Action("GetNextPage")", bindJournalList);
+                }
+            });
+        }
+    
+    
+        function bindJournalList(journals) {
+
+            $("#journalList > tbody > tr ").remove();
+            journalIds.length = 0; //clear the array
+            $.each(journals, function (i, journal) {
+                var journalRow = '<tr>'
+                    + '<td><a name="lnkId" href="#" title="'+ journal.UID +'">' + journal.DisplayID + '</a></td>'
+                    + '<td>' + isNull(journal.Description, "") + '</td>'
+                    + '<td>' + formatJsonDate(journal.DateOccurred) + '</td>'
+                    + '<td>' + formatJsonDate(journal.DatePosted) + '</td>'
+                    + '<td>' + journal.JournalType + '</td>'
+                    + '</tr>';
+                $(journalRow).appendTo("#journalList");
+                journalIds.push(journal.UID);
+            });
+
+            $('#journalList').accordion({
+                header: '.accordion',
+                active: false,
+                autoHeight: false,
+                collapsible: true,
+                icons: false
+            });
+        }
+
+        $(document).on('click', 'a[name="lnkId"]', function (event) {
+            goDetails($(this).attr("title"));
+        });
+
+        var journalIds = [];
+        var journalDetailIndex;
+        function goDetails(id) {
+            var url = '@Url.Action("Details")/' + id;
+            $.get(url, function (data) {
+                $("#journalDetails > div.modal-body").html($(data).find("div.modal-body").html());
+                $("#journalDetails > div.modal-header").html($(data).find("div.modal-header").html());
+                $("#journalDetails").modal('show');
+                journalDetailIndex = getJournalDetailIdIndex(id);
+            });
+        }
+
+        function getJournalDetailIdIndex(detailId) {
+            for (var i = 0; i < journalIds.length; i++) {
+                if (journalIds[i] == detailId) {
+                    return i;
+                }
+            }
+        }
+
+        function getNextJournalId() {
+            if (journalDetailIndex == journalIds.length - 1)
+                return journalIds[0];
+
+            return journalIds[journalDetailIndex + 1];
+        }
+        function getPrevJournalId() {
+            if (journalDetailIndex == 0)
+                return journalIds[journalIds.length - 1];
+
+            return journalIds[journalDetailIndex - 1];
+        }
+});
+
+
+    
+
+</script>

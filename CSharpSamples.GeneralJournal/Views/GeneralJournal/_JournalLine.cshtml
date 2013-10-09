@@ -18,7 +18,7 @@
 //
 //Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
 }
-@model CSharpSamples.GeneralJournal.Models.JournalLineModel
+@model MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger.GeneralJournalLine
 
             
 <tr class="editorRow">
@@ -28,23 +28,17 @@
         <button type="button" class="btn btn-link" onclick="javascript:deleteLine(this)"><i class="icon-remove" ></i></button>
     </td>
     <td>
-        @Html.TextBoxFor(item => item.AccountId, new { style = "width: 80px;", @class="accountnumber" })
+        @Html.HiddenFor(item => item.Account.UID)
+        @Html.TextBoxFor(item => item.Account.DisplayID, new { style = "width: 80px;", @class="accountnumber" })
     </td>
                  
     <td>
-        @Html.TextBoxFor(item => item.AccountName, new { style = "width: 150px;", @readonly = true })
+        @Html.TextBoxFor(item => item.Account.Name, new { style = "width: 150px;", @readonly = true })
     </td>
                  
     <td>
-        @Html.TextBoxFor(item => item.Debit, new { style = "width: 80px;", @class="currency" })
-    </td>
-                 
-    <td>
-        @Html.TextBoxFor(item => item.Credit, new { style = "width: 80px;", @class = "currency" })
-    </td>
-                 
-    <td>
-        @Html.TextBoxFor(item => item.JobId, new { style = "width: 100px;" })
+        @Html.HiddenFor(item => item.Job.UID)
+        @Html.TextBoxFor(item => item.Job.Name, new { style = "width: 100px;" })
     </td>
                  
     <td>
@@ -53,7 +47,8 @@
                  
                  
     <td>
-        @Html.TextBoxFor(item => item.TaxCodeId, new { style = "width: 40px;" })
+        @Html.HiddenFor(item => item.TaxCode.UID)
+        @Html.TextBoxFor(item => item.TaxCode.Code, new { style = "width: 40px;" })
     </td>
     
     <td>
@@ -61,7 +56,7 @@
     </td>
            
     <td>
-        @Html.CheckBoxFor(item => item.IsOverridenTaxAmount, new { style = "width: 20px;" })
+        @Html.CheckBoxFor(item => item.IsOverriddenTaxAmount, new { style = "width: 20px;" })
     </td> 
 </tr>
 

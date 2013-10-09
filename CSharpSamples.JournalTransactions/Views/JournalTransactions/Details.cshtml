@@ -18,12 +18,12 @@
 //
 //Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
 }
-@model CSharpSamples.JournalTransactions.Models.JournalTransactionModel
+@model MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger.JournalTransaction
 
 <div>
   <div class="modal-header">      
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h4>Journal Transaction <span class="label label-info">@Model.JournalTypeDisplay</span></h4>
+    <h4>Journal Transaction <span class="label label-info">@Model.JournalType</span></h4>
   </div>
   <div class="modal-body">
     <div id="journalHeader" class="row-fluid">
@@ -31,7 +31,7 @@
             <div class="control-group">
                 <label class="control-label" for="Id">Number</label>
                 <div class="controls">
-                    @Html.TextBoxFor(m => m.Id, new {@class = "input-small uneditable-input"})
+                    @Html.TextBoxFor(m => m.DisplayID, new {@class = "input-small uneditable-input"})
                 </div>
             </div>
             <div class="control-group">
@@ -71,9 +71,7 @@
     <table id="journalLineTable" class="table table-bordered table-condensed">
         <thead>
             <tr>
-                <th>Account</th>
-                <th>Account Type</th>
-                <th>Sub Type</th>
+                <th>Account</th>               
                 <th>Debit</th>
                 <th>Credit</th>
                 <th>Job</th>
@@ -86,9 +84,7 @@
             {
             
                 <tr>
-                    <td>@line.AccountId</td>
-                    <td>@line.AccountType</td>
-                    <td>@line.SubAccountType</td>
+                    <td>@line.Account.DisplayID</td>                
                     
                     <td style="text-align:right;">
                     @if (line.IsCredit)
@@ -104,7 +100,11 @@
                     }
                     </td>
 
-                    <td>@line.JobId</td>
+                    <td>@if (line.Job != null)
+                        {
+                            @line.Job.Number
+                        }       
+                    </td>
                     <td>@line.LineDescription</td>
 
                     <td>

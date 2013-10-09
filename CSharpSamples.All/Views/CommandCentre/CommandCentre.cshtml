@@ -44,10 +44,10 @@
                     <ul class="nav" style="padding-top:10px"><li>@Html.ActionLink("AccountRight API", "Index", "CommandCentre")</li></ul>
                     <ul class="nav pull-right" style="padding-top:10px">                        
                         @{
-                            var controller = (CSharpSamples.Common.IBusinessController)ViewContext.Controller;
+                            var controller = (CSharpSamples.Common.ControllerBase)ViewContext.Controller;
                             if(controller.IsLogon)
                             {
-                                if(controller.CompanyFile.IsCloud)
+                                if(controller.APIConfiguration.ClientId != null)
                                 {
                                     <li><a href="#" id="lnkCompanyLogOn" onclick="javascript:logOffCompany()"><img style="width: 32px" src="@Url.Content("~/Content/themes/common/images/cloud.png")"/>
                                         @controller.CompanyFile.Name as @controller.CurrentUser | Log Out</a></li>

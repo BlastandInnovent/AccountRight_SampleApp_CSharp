@@ -1,0 +1,291 @@
+﻿@{//  File:        Details.cshtml
+//  Copyright:   Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+//  Website:     http://www.myob.com
+//  Author:      MYOB
+//  E-mail:      info@myob.com
+//
+//Documentation, code and sample applications provided by MYOB Australia are for 
+//information purposes only. MYOB Technology Pty Ltd and its suppliers make no 
+//warranties, either express or implied, in this document. 
+//
+//Information in this document or code, including website references, is subject
+//to change without notice. Unless otherwise noted, the example companies, 
+//organisations, products, domain names, email addresses, people, places, and 
+//events are fictitious. 
+//
+//The entire risk of the use of this documentation or code remains with the user. 
+//Complying with all applicable copyright laws is the responsibility of the user. 
+//
+//Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+}
+@model MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger.GeneralJournal
+
+@{
+    ViewBag.Title = "General Journal";
+}
+    
+    <legend>General Journal  <a href='@Url.Action("Index")' class="btn"><i class="icon-list"></i> List</a></legend>
+    
+    <div id="journalHeader" class="row-fluid">
+        <div class="form-horizontal span6">
+            <div class="control-group">
+                @Html.HiddenFor(m => m.UID)
+                @Html.HiddenFor(m => m.RowVersion)
+                <label class="control-label" for="gstReportingMethodOption">Display in GST[BAS] report as</label>
+                <div class="controls">
+                    <div class="btn-group" id="gstReportingMethodOption" data-toggle="buttons-radio">
+                        <button type="button" class="btn" value="Sale" style="width:110px">Sale</button>
+                        <button type="button" class="btn" value="Purchase" style="width:110px">Purchase</button>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="JournalNo">Journal No</label>
+                <div class="controls">
+                    @Html.EditorFor(m => m.DisplayID)
+                </div>
+            </div>
+    
+            <div class="control-group">
+                <label class="control-label" for="DateOccurred">Date</label>
+                <div class="controls">
+                    <div class="input-append">
+                    @Html.TextBoxFor(m => m.DateOccurred, new Dictionary<string, object> { { "Value", Model.DateOccurred.ToString("yyyy-MM-dd")}, { "class", "span10"} })
+                        <button class="btn" id="btnDateOccurred"><i class="icon-calendar"></i></button>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="control-group">
+                <label class="control-label" for="CategoryId">Category</label>
+                <div class="controls" id="CategoryDetails">
+                    @Html.HiddenFor(m => m.Category.UID)
+                    @Html.EditorFor(m => m.Category.Name)
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal span6">
+            
+            <div class="control-group">
+                <label class="control-label" for="taxInclusiveOption">Tax Inclusive</label>
+                <div class="controls">
+                    <div class="btn-group" id="taxInclusiveOption" data-toggle="buttons-radio">
+                        <button type="button" class="btn" value="True" style="width:110px">Yes</button>
+                        <button type="button" class="btn" value="False" style="width:110px">No</button>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="yearEndAdjustmentOption">Year End Adjustment</label>
+                <div class="controls">
+                    <div class="btn-group" id="yearEndAdjustmentOption" data-toggle="buttons-radio">
+                        <button type="button" class="btn" value="True" style="width:110px">Yes</button>
+                        <button type="button" class="btn" value="False" style="width:110px">No</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label pull-right" for="Memo">Memo</label>
+                <div class="controls">
+                    @Html.TextAreaFor(m => m.Memo, new { width = 300, rows = 6 })
+                </div>
+            </div>
+            
+            
+            
+        </div>
+    </div>
+
+    <table id="journalLineTable" class="table table-bordered table-condensed">
+        <tr>
+            <th><button type="button" class="btn btn-link" id="addLine"><i class="icon-plus"></i></button></th>
+            <th>Account No</th>
+            <th>Account Name</th>
+            <th>Debit</th>
+            <th>Credit</th>
+            <th>Job</th>
+            <th>Memo</th>
+            <th>Tax</th>
+            <th>Tax Amount</th>
+            <th>Override</th>
+        </tr>
+    
+        <tbody>
+            @for (var i = 0; i < Model.Lines.Count; i++)
+            {
+                Html.RenderPartial("_JournalLine", Model.Lines[i]);
+            }
+        </tbody>
+
+    </table>
+    <button type="button" class="btn btn-primary" value="Save" id="btnSave">Save   <i class="icon-download-alt"></i></button>
+<button id="btnDeleteJournal" type="button" class="btn btn-warning" value="Delete">Delete <i class="icon-trash"></i></button>
+
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/GeneralJournal.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.mask.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.formatCurrency-1.4.0.js")"></script>
+<script>
+    $(function () {
+        $("#DateOccurred").datepicker({
+            dateFormat: "yy-mm-dd",
+            showAnim: "slideDown", 
+            showButtonPanel: true
+        });
+
+        $(".currency").trigger("blur");
+        
+        $(".accountnumber").trigger("blur");
+
+        if ('@Model.IsYearEndAdjustment' == 'True')
+            $('#chkYearEndAdjustment').attr('checked', 'checked')
+
+
+        $("#gstReportingMethodOption").find("button").each(function () {
+            if ($(this).val() == '@Model.GSTReportingMethod') {
+                $(this).addClass('active');
+            }
+        });
+
+        $("#taxInclusiveOption").find("button").each(function () {
+            if ($(this).val() == '@Model.IsTaxInclusive') {
+                $(this).addClass('active');
+            }
+        });
+
+        $("#yearEndAdjustmentOption").find("button").each(function () {
+            if ($(this).val() == '@Model.IsYearEndAdjustment') {
+                $(this).addClass('active');
+            }
+        });
+    });
+
+    $(".accountnumber").live("blur", function () {
+        $(this).mask('0-0000');
+    });
+    $(".currency").live("blur", function () {
+        $(this).formatCurrency();
+    });
+    $("#btnDateOccurred").toggle(function () {
+        $("#DateOccurred").datepicker("show");
+    }, function () {
+        $("#DateOccurred").datepicker("hide");
+    });
+
+    $("#btnSave").unbind('click');
+    $("#btnSave").click(function (event) {
+        event.preventDefault();
+
+        var lines = $("#journalLineTable tbody tr[class='editorRow']").map(function () {
+            
+            var account = $(this).map(function () {
+                return {
+                    UID: $(this).find("input[name='Account.UID']").first().val(),
+                    DisplayID: $(this).find("input[name='AccountNumber']").first().val(),
+                };
+            }).get(0);
+
+            var taxCode = $(this).map(function () {
+                return {
+                    UID: $(this).find("input[name='TaxCode.UID']").first().val(),
+                    DisplayID: $(this).find("input[name='TaxCodeId']").first().val(),
+                };
+            }).get(0);
+            
+            var job = $(this).map(function () {
+                return {
+                    UID: $(this).find("input[name='Job.UID']").first().val(),
+                };
+            }).get(0);
+
+            return {
+                Account: account,
+                AccountNumber: $(this).find("input[name='AccountNumber']").first().val(),
+                AccountName: $(this).find("input[name='AccountName']").first().val(),
+                Debit: $(this).find("input[name='Debit']").first().asNumber().toString(),
+                Credit: $(this).find("input[name='Credit']").first().asNumber().toString(),
+                job: job,
+                JobId: $(this).find("input[name='JobId']").first().val(),
+                Memo: $(this).find("input[name='Memo']").first().val(),
+                TaxCode: taxCode,
+                TaxCodeId: $(this).find("input[name='TaxCodeId']").first().val(),
+                IsOverridenTaxAmount: $(this).find("input[name='IsOverridenTaxAmount']").first().attr("checked") == "checked",
+                TaxAmount: $(this).find("input[name='TaxAmount']").first().asNumber().toString(),
+                RowVersion: $(this).find("input[name='RowVersion']").first().val(),
+                RowId: $(this).find("input[name='RowId']").first().val()
+            };
+        }).get();
+        
+        var category = $("#CategoryDetails").map(function () {
+            return {
+                UID: $(this).find("input[name='Category.UID']").first().val(),
+                DisplayID: $(this).find("input[name='CategoryId']").first().val(),
+            };
+        }).get(0);
+
+
+        var journal = $("#journalHeader").map(function () {
+            return {
+                UID: $(this).find("input[name='UID']").first().val(),
+                RowVersion: $(this).find("input[name='RowVersion']").first().val(),
+                JournalNo: $(this).find("input[name='JournalNo']").first().val(),
+                Memo: $(this).find("textarea[name='Memo']").first().val(),
+                GSTReportingMethod: $("#gstReportingMethodOption > button.active").val(),
+                DateOccurred: $(this).find("input[name='DateOccurred']").first().val(),
+                IsYearEndAdjustment: $("#yearEndAdjustmentOption > button.active").val(),
+                IsTaxInclusive: $("#taxInclusiveOption > button.active").val(),
+                CategoryId: $(this).find("input[name='CategoryId']").first().val(),
+                Category: category,
+                Lines: lines
+            };
+        }).get(0);
+
+        var urlSave = '@Url.Action("Save")';
+        
+        $.ajax({
+            type: 'POST',
+            url: urlSave,
+            dataType: 'json',
+            data: JSON.stringify(journal),
+            contentType: 'application/json; charset=utf-8'
+
+        }).done(function (data) {
+            if (data.ok == false) {
+                showMessageBox("General Journal", data.message);
+            } else {
+                showMessageBox("General Journal", "Record saved!", recordSavedSuccess);
+            }
+        });
+
+        return false;
+    });
+
+    function recordSavedSuccess() {
+        window.location = '@Url.Action("Index")';
+    }
+
+    function deleteLine(line) {
+        $(line).parents("tr.editorRow:first").remove();
+        return false;
+    }
+    $("#addLine").unbind('click');
+    $("#addLine").click(function (event) {
+        var urlNewLine = '@Url.Action("AddNewLine")';
+
+        $.get(urlNewLine, function (data) {
+            $(data).prependTo($("#journalLineTable > tbody:last"));
+            
+            $(".currency").trigger("blur");
+
+            $(".accountnumber").trigger("blur");
+        });
+
+    });
+
+    $("#btnDeleteJournal").unbind('click');
+    $("#btnDeleteJournal").click(function (event) {
+        deleteJournal('@Model.UID', '@Model.UID', '@Url.Action("Delete")', '@Url.Action("Index")');
+    });
+
+</script>

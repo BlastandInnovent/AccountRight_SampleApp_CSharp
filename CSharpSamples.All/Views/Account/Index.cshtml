@@ -1,0 +1,244 @@
+﻿@{//  File:        Index.cshtml
+//  Copyright:   Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+//  Website:     http://www.myob.com
+//  Author:      MYOB
+//  E-mail:      info@myob.com
+//
+//Documentation, code and sample applications provided by MYOB Australia are for 
+//information purposes only. MYOB Technology Pty Ltd and its suppliers make no 
+//warranties, either express or implied, in this document. 
+//
+//Information in this document or code, including website references, is subject
+//to change without notice. Unless otherwise noted, the example companies, 
+//organisations, products, domain names, email addresses, people, places, and 
+//events are fictitious. 
+//
+//The entire risk of the use of this documentation or code remains with the user. 
+//Complying with all applicable copyright laws is the responsibility of the user. 
+//
+//Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
+}
+@{
+    ViewBag.Title = "Accounts";
+}
+<legend>@ViewBag.Title <button class="btn" onclick="javascript:createNew()"><i class="icon-file"></i> New</button></legend>
+
+<div class="accordion" id="accountFilter">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <div class="form-inline" style="margin: 10px;">
+                <div class="control-group">
+                    <select id="field" name="field">
+                        <option value="DisplayID">Number</option>
+                        <option value="Name">Name</option>
+                        <option value="Description">Description</option>
+                        <option value="TaxCodeId">Tax Code</option>
+                        <option value="Currency">Currency</option>
+                        <option value="OpeningAccountBalance">Opening Balance</option>
+                        <option value="CurrentAccountBalance">Current Balance</option>
+                    </select>
+                    <div id="searchFields" class="input-append">
+                        <input type="text" id="search" name="search" placeholder="Search" class="input-xlarge"/>
+                        <button type="button" id="btnSearchAccount" value="Search" class="btn"><i class="icon-search"></i></button>
+                    </div>
+                    <button type="button" id="btnResetSearchAccount" value="Reset" class="btn" title="Reset filters"><i class="icon-remove"></i></button>
+                    
+                    <a class="btn btn-link" data-toggle="collapse" data-parent="#accountFilter" href="#advanceFilterContent">
+                        More filters
+                    </a>
+                </div> 
+            </div>
+        </div>
+
+        <div id="advanceFilterContent" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <div class="form-inline">
+                    <div class="form-horizontal span5">
+                        <div class="control-group">
+                            <label class="control-label" for="cboSubType">Sub Type</label>
+                            <div class="controls">  
+                                @Html.DropDownList("cboSubType", (IEnumerable<SelectListItem>)ViewBag.SubTypes)
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="cboAccountType">Account Type</label>
+                            <div class="controls">  
+                                @Html.DropDownList("cboAccountType", (IEnumerable<SelectListItem>)ViewBag.AccountTypes)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-horizontal span5">
+                        <div class="control-group">  
+                            <div class="btn-group" id="isHeaderFilter"  data-toggle="buttons-radio">
+                                <button type="button" class="btn" style="width:80px" value="true">Header</button>
+                                <button type="button" class="btn" style="width:80px" value="false">Detail</button>
+                                <button type="button" class="btn active"  style="width:80px" value="">All</button>
+                            </div>
+
+                        </div>
+                        <div class="control-group"> 
+                            <div class="btn-group" id="isActiveFilter"  data-toggle="buttons-radio">
+                                <button type="button" class="btn" style="width:80px" value="true">Active</button>
+                                <button type="button" class="btn" style="width:80px" value="false">Inactive</button>
+                                <button type="button" class="btn active"  style="width:80px" value="">All</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="accountList" class="table table-hover table-condensed">
+    <thead class="well well-small">
+        <tr>
+            <th colspan="4">Number</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Tax Code</th>            
+            <th style="text-align: right">Opening</th>
+            <th style="text-align: right">Current</th>
+            <th>Classification</th>
+            <th>Account Type</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr></tr>
+    </tbody>
+</table>
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/Account.js")"></script>
+<script>
+    $(function () {
+        if ('@((ViewContext.Controller as CSharpSamples.Common.IBusinessController).IsLogon)' == 'True') {
+            searchAccounts();
+        }
+        function getAccountTypeString(id) {
+            var ret=""; 
+            $("#cboSubType option").each(function () {
+                if ($(this).val() == id)
+                    ret = $(this).text();
+            });
+            return ret; 
+        }
+        function getClassificationString(id) {
+            var ret = "";
+            $("#cboAccountType option").each(function () {
+                if ($(this).val() == id)
+                    ret = $(this).text();
+            });
+            return ret;
+        }
+        function bindAccountList(accounts) {
+            $("#accountList > tbody > tr ").remove();
+            $.each(accounts, function (i, account) {
+
+                var accountRow = '<tr>';
+                if (account.IsActive == false)
+                    accountRow = '<tr class="muted">';
+
+                if (account.IsHeader == true)
+                    accountRow = '<tr style="font-weight:bold">';
+
+
+                // contruct indent leveling
+                for (var i = 1; i < account.Level; i++) {
+                    accountRow += '<td></td>';
+                }
+
+                accountRow += '<td colspan="' + (5 - account.Level).toString() + '">'
+                    + account.DisplayID;
+
+                if (account.IsActive == false)
+                    accountRow += ' <i class="icon-thumbs-down" title="inactive"></i>';
+
+                var taxCode = "";
+                if (account.TaxCode != null) 
+                    taxCode = account.TaxCode.Code; 
+                
+                accountRow += '</td>'
+                    + '<td><a href="#" onclick="javascript:goDetails(\'' + account.UID + '\', false)">'
+                    + account.Name
+                    + '</a></td>'
+                    + '<td>' + account.Description + '</td>'
+                    + '<td>' + isNull(taxCode, "") + '</td>'                   
+                    + '<td style="text-align: right">' + account.OpeningBalance + '</td>'
+                    + '<td style="text-align: right">' + account.CurrentBalance + '</td>'
+                    + '<td>' + getClassificationString(account.Classification) + '</td>'
+                    + '<td>' + getAccountTypeString(account.Type) + '</td>'
+
+                + '<td><button class="btn btn-link" onclick="javascript:deleteAccount(\'' + account.UID + '\',\'' + account.DisplayID + ' ' + account.Name +
+                    '\',\'' + '@Url.Action("DeleteAccount")' + '\',\'' + '@Url.Action("Index")' + '\')"><i class="icon-trash"></i></button></td>'
+
+
+                    + '</tr>';
+
+                $(accountRow).appendTo("#accountList > tbody");
+            });
+        }
+
+        $("#btnSearchAccount").unbind("click");
+        $("#btnSearchAccount").click(function (event) {
+            searchAccounts();
+        });
+
+        function searchAccounts() {
+            var search = $("#search").val();
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("SearchAccount", "Account")",
+                data: {
+                    field: $("#field").val(),
+                    search: search,
+                    subType: $('#cboSubType').val(),
+                    accountType: $('#cboAccountType').val(),
+                    isHeader: $("#isHeaderFilter > button.active").val(),
+                    isActive: $("#isActiveFilter > button.active").val(),
+                    pageCount: defaultPageCount
+                }
+            }
+            ).done(function (data) {
+                if (data.ok == false) {
+                    showMessageBox(data.message);
+                } else {
+                    applyPager($("#accountList"), data, "@Url.Action("GetPrevPage")", "@Url.Action("GetNextPage")", bindAccountList);
+                }
+            });
+        }
+
+
+        $("#btnResetSearchAccount").unbind("click");
+        $("#btnResetSearchAccount").click(function (event) {
+
+            $("#isHeaderFilter").find("button").each(function () {
+                $(this).removeClass('active');
+                if ($(this).val() == '') {
+                    $(this).addClass('active');
+                }
+            });
+
+            $("#isActiveFilter").find("button").each(function () {
+                $(this).removeClass('active');
+                if ($(this).val() == '') {
+                    $(this).addClass('active');
+                }
+            });
+
+            $("#cboSubType").val("0");
+            $("#cboAccountType").val("0");
+            $("#search").val('');
+            searchAccounts();
+        })
+
+    });
+    function createNew() {
+        window.location = '@Url.Action("CreateNewAccount")';
+    }
+
+    function goDetails(id) {
+        window.location = '@Url.Action("Details")/' + id;
+    }
+
+
+</script>

@@ -29,9 +29,9 @@
             <div class="form-inline" style="margin: 10px;">
                 <div class="control-group">
                     <select id="field" name="field">
-                        <option value="Id">Number</option>
-                        <option value="AccountName">Name</option>
-                        <option value="AccountDescription">Description</option>
+                        <option value="DisplayID">Number</option>
+                        <option value="Name">Name</option>
+                        <option value="Description">Description</option>
                         <option value="TaxCodeId">Tax Code</option>
                         <option value="Currency">Currency</option>
                         <option value="OpeningAccountBalance">Opening Balance</option>
@@ -95,12 +95,11 @@
             <th colspan="4">Number</th>
             <th>Name</th>
             <th>Description</th>
-            <th>Tax Code</th>
-            <th>Currency</th>
+            <th>Tax Code</th>            
             <th style="text-align: right">Opening</th>
             <th style="text-align: right">Current</th>
+            <th>Classification</th>
             <th>Account Type</th>
-            <th>Sub Type</th>
             <th></th>
         </tr>
     </thead>
@@ -115,13 +114,28 @@
         if ('@((ViewContext.Controller as CSharpSamples.Common.IBusinessController).IsLogon)' == 'True') {
             searchAccounts();
         }
-
+        function getAccountTypeString(id) {
+            var ret=""; 
+            $("#cboSubType option").each(function () {
+                if ($(this).val() == id)
+                    ret = $(this).text();
+            });
+            return ret; 
+        }
+        function getClassificationString(id) {
+            var ret = "";
+            $("#cboAccountType option").each(function () {
+                if ($(this).val() == id)
+                    ret = $(this).text();
+            });
+            return ret;
+        }
         function bindAccountList(accounts) {
             $("#accountList > tbody > tr ").remove();
             $.each(accounts, function (i, account) {
 
                 var accountRow = '<tr>';
-                if (account.IsInactive == true)
+                if (account.IsActive == false)
                     accountRow = '<tr class="muted">';
 
                 if (account.IsHeader == true)
@@ -129,29 +143,32 @@
 
 
                 // contruct indent leveling
-                for (var i = 1; i < account.AccountLevel; i++) {
+                for (var i = 1; i < account.Level; i++) {
                     accountRow += '<td></td>';
                 }
 
-                accountRow += '<td colspan="' + (5 - account.AccountLevel).toString() + '">'
-                    + account.AccountNumberFormatted;
+                accountRow += '<td colspan="' + (5 - account.Level).toString() + '">'
+                    + account.DisplayID;
 
-                if (account.IsInactive == true)
+                if (account.IsActive == false)
                     accountRow += ' <i class="icon-thumbs-down" title="inactive"></i>';
 
+                var taxCode = "";
+                if (account.TaxCode != null) 
+                    taxCode = account.TaxCode.Code; 
+                
                 accountRow += '</td>'
-                    + '<td><a href="#" onclick="javascript:goDetails(\'' + account.Id + '\', false)">'
-                    + account.AccountName
+                    + '<td><a href="#" onclick="javascript:goDetails(\'' + account.UID + '\', false)">'
+                    + account.Name
                     + '</a></td>'
-                    + '<td>' + account.AccountDescription + '</td>'
-                    + '<td>' + isNull(account.TaxCodeId, "") + '</td>'
-                    + '<td>' + isNull(account.Currency, "") + '</td>'
-                    + '<td style="text-align: right">' + account.OpeningAccountBalanceDisplay + '</td>'
-                    + '<td style="text-align: right">' + account.CurrentAccountBalanceDisplay + '</td>'
-                    + '<td>' + account.AccountTypeDisplay + '</td>'
-                    + '<td>' + account.SubTypeDisplay + '</td>'
+                    + '<td>' + account.Description + '</td>'
+                    + '<td>' + isNull(taxCode, "") + '</td>'                   
+                    + '<td style="text-align: right">' + account.OpeningBalance + '</td>'
+                    + '<td style="text-align: right">' + account.CurrentBalance + '</td>'
+                    + '<td>' + getClassificationString(account.Classification) + '</td>'
+                    + '<td>' + getAccountTypeString(account.Type) + '</td>'
 
-                + '<td><button class="btn btn-link" onclick="javascript:deleteAccount(\'' + account.Id + '\',\'' + account.AccountNumberFormatted + ' ' + account.AccountName +
+                + '<td><button class="btn btn-link" onclick="javascript:deleteAccount(\'' + account.UID + '\',\'' + account.DisplayID + ' ' + account.Name +
                     '\',\'' + '@Url.Action("DeleteAccount")' + '\',\'' + '@Url.Action("Index")' + '\')"><i class="icon-trash"></i></button></td>'
 
 
@@ -222,4 +239,6 @@
     function goDetails(id) {
         window.location = '@Url.Action("Details")/' + id;
     }
+
+
 </script>
