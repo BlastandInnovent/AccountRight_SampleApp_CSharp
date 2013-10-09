@@ -28,8 +28,11 @@ namespace CSharpSamples.Common.Helpers
     {
         public static string ConstructOrderByQueryString(this IEnumerable<SortDescription> sorting)
         {
-            if (sorting == null || !sorting.Any()) return string.Empty;
+            if (sorting == null) return string.Empty; 
+            var sorts = sorting.Where(x => !string.IsNullOrEmpty(x.Field)).ToList();
 
+            if (sorts == null || !sorts.Any()) return string.Empty;
+            
             return "$orderby=" + string.Join(",", sorting.Select(s => s.Field + " " + s.Direction.ToString()));
         }
 
@@ -54,7 +57,7 @@ namespace CSharpSamples.Common.Helpers
 
         private static string ConstructUriFilterString(SearchCriteria criteria)
         {
-            return string.Format("{0} {1} {2}", criteria.Field, GetOperand(criteria.OperandType), UriLiteral(criteria.FieldType, criteria.SearchText));
+            return string.Format("{0} {1} '{2}'", criteria.Field, GetOperand(criteria.OperandType), UriLiteral(criteria.FieldType, criteria.SearchText));
         }
 
 
@@ -99,6 +102,39 @@ namespace CSharpSamples.Common.Helpers
             return string.Format("$top={0}&$skip=0", pageCount);
         }
 
+        
+        public static string CombineQuery(IEnumerable<SearchCriteria> searches, LogicalOperator logical, IEnumerable<SortDescription> sorting, int? pageCount)
+        {
+            var queries = new List<string>();
+            if (pageCount.HasValue)
+                queries.Add(GetPagingQueryString(pageCount.Value));
+            if (searches != null && searches.Count() > 0)
+                queries.Add(searches.ConstructFilterQueryString(logical));
+            if (sorting != null && sorting.Count() > 0)
+                queries.Add(sorting.ConstructOrderByQueryString());
+
+            return CombineQuery(queries);
+        }
+        
+        public static string CombineQuery(IEnumerable<string> queries)
+        {
+            var queriesToConstruct = queries.Where(q => !string.IsNullOrEmpty(q)).ToList();
+            var query = ""; 
+
+            for (var i = 0; i < queriesToConstruct.Count(); i++)
+            {
+                if (string.IsNullOrEmpty(query))
+                    query = queriesToConstruct[i];
+                else
+                    query += "&" + queriesToConstruct[i];
+            }
+
+            return query; 
+        }
+
+
+
+        [Obsolete("Will be removed after refactor for .Net SDK")]
         public static string Combine(this string url, IEnumerable<SearchCriteria> searches, LogicalOperator logical, IEnumerable<SortDescription> sorting, int? pageCount)
         {
             var queries = new List<string>();
@@ -112,6 +148,7 @@ namespace CSharpSamples.Common.Helpers
             return url.Combine(queries);
         }
 
+        [Obsolete("Will be removed after refactor for .Net SDK")]
         public static string Combine(this string url, IEnumerable<string> queries)
         {
             var builder = new UriBuilder(url);
@@ -130,21 +167,21 @@ namespace CSharpSamples.Common.Helpers
             return builder.Uri.ToString();
         }
         
-        public static string GetUrl(this string url, bool isCloud, OAuthInfo oAuthInfo)
-        {
-            if (isCloud)
-            {
-                //var builder = new UriBuilder(url);
+        //public static string GetUrl(this string url, bool isCloud, OAuthInfo oAuthInfo)
+        //{
+        //    if (isCloud)
+        //    {
+        //        //var builder = new UriBuilder(url);
 
-                //if (!string.IsNullOrEmpty(builder.Query))
-                //    builder.Query.Insert(0, string.Format("key={0}&", oAuthInfo.DevKey));
-                //else
-                //    builder.Query = string.Format("key={0}&", oAuthInfo.DevKey);
+        //        //if (!string.IsNullOrEmpty(builder.Query))
+        //        //    builder.Query.Insert(0, string.Format("key={0}&", oAuthInfo.DevKey));
+        //        //else
+        //        //    builder.Query = string.Format("key={0}&", oAuthInfo.DevKey);
 
-                //return builder.Uri.ToString();
-            }
+        //        //return builder.Uri.ToString();
+        //    }
 
-            return url;
-        }
+        //    return url;
+        //}
     }
 }

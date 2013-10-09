@@ -10,13 +10,12 @@ namespace CSharpSamples.Common.Helpers
         public static IDictionary<int, string> GetEnumList(Type enumType, Func<int, string, string> getCustomName = null)
         {
             var names = Enum.GetNames(enumType).ToList();
-            var values = Enum.GetValues(enumType);
             var valuePair = new Dictionary<int, string>();
 
             for (var i = 0; i < names.Count(); i++)
             {
                 var name = names[i];
-                var value = Convert.ToInt32(values.GetValue(i));
+                var value = Convert.ToInt32(Enum.Parse(enumType, name));
 
                 if (getCustomName != null)
                     name = getCustomName(value, name);

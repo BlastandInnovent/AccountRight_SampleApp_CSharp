@@ -18,9 +18,12 @@
 //
 //Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
 
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Packaging;
+using System.Linq;
 
 namespace CSharpSamples.Common.Utilities
 {

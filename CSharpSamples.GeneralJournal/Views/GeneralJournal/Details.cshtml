@@ -18,7 +18,7 @@
 //
 //Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
 }
-@model CSharpSamples.GeneralJournal.Models.GeneralJournalModel
+@model MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger.GeneralJournal
 
 @{
     ViewBag.Title = "General Journal";
@@ -29,7 +29,7 @@
     <div id="journalHeader" class="row-fluid">
         <div class="form-horizontal span6">
             <div class="control-group">
-                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.UID)
                 @Html.HiddenFor(m => m.RowVersion)
                 <label class="control-label" for="gstReportingMethodOption">Display in GST[BAS] report as</label>
                 <div class="controls">
@@ -40,9 +40,9 @@
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="Id">Journal No</label>
+                <label class="control-label" for="JournalNo">Journal No</label>
                 <div class="controls">
-                    @Html.EditorFor(m => m.Id)
+                    @Html.EditorFor(m => m.DisplayID)
                 </div>
             </div>
     
@@ -58,8 +58,9 @@
     
             <div class="control-group">
                 <label class="control-label" for="CategoryId">Category</label>
-                <div class="controls">
-                    @Html.EditorFor(m => m.CategoryId)
+                <div class="controls" id="CategoryDetails">
+                    @Html.HiddenFor(m => m.Category.UID)
+                    @Html.EditorFor(m => m.Category.Name)
                 </div>
             </div>
         </div>
@@ -177,31 +178,65 @@
         event.preventDefault();
 
         var lines = $("#journalLineTable tbody tr[class='editorRow']").map(function () {
+            
+            var account = $(this).map(function () {
+                return {
+                    UID: $(this).find("input[name='Account.UID']").first().val(),
+                    DisplayID: $(this).find("input[name='AccountNumber']").first().val(),
+                };
+            }).get(0);
+
+            var taxCode = $(this).map(function () {
+                return {
+                    UID: $(this).find("input[name='TaxCode.UID']").first().val(),
+                    DisplayID: $(this).find("input[name='TaxCodeId']").first().val(),
+                };
+            }).get(0);
+            
+            var job = $(this).map(function () {
+                return {
+                    UID: $(this).find("input[name='Job.UID']").first().val(),
+                };
+            }).get(0);
+
             return {
-                AccountId: $(this).find("input[name='AccountId']").first().val(),
+                Account: account,
+                AccountNumber: $(this).find("input[name='AccountNumber']").first().val(),
                 AccountName: $(this).find("input[name='AccountName']").first().val(),
                 Debit: $(this).find("input[name='Debit']").first().asNumber().toString(),
                 Credit: $(this).find("input[name='Credit']").first().asNumber().toString(),
+                job: job,
                 JobId: $(this).find("input[name='JobId']").first().val(),
                 Memo: $(this).find("input[name='Memo']").first().val(),
+                TaxCode: taxCode,
                 TaxCodeId: $(this).find("input[name='TaxCodeId']").first().val(),
                 IsOverridenTaxAmount: $(this).find("input[name='IsOverridenTaxAmount']").first().attr("checked") == "checked",
                 TaxAmount: $(this).find("input[name='TaxAmount']").first().asNumber().toString(),
                 RowVersion: $(this).find("input[name='RowVersion']").first().val(),
-                RowId: $(this).find("input[name='TaxCodeId']").first().val()
+                RowId: $(this).find("input[name='RowId']").first().val()
             };
         }).get();
         
+        var category = $("#CategoryDetails").map(function () {
+            return {
+                UID: $(this).find("input[name='Category.UID']").first().val(),
+                DisplayID: $(this).find("input[name='CategoryId']").first().val(),
+            };
+        }).get(0);
+
+
         var journal = $("#journalHeader").map(function () {
             return {
+                UID: $(this).find("input[name='UID']").first().val(),
                 RowVersion: $(this).find("input[name='RowVersion']").first().val(),
-                Id: $(this).find("input[name='Id']").first().val(),
+                JournalNo: $(this).find("input[name='JournalNo']").first().val(),
                 Memo: $(this).find("textarea[name='Memo']").first().val(),
                 GSTReportingMethod: $("#gstReportingMethodOption > button.active").val(),
                 DateOccurred: $(this).find("input[name='DateOccurred']").first().val(),
                 IsYearEndAdjustment: $("#yearEndAdjustmentOption > button.active").val(),
                 IsTaxInclusive: $("#taxInclusiveOption > button.active").val(),
                 CategoryId: $(this).find("input[name='CategoryId']").first().val(),
+                Category: category,
                 Lines: lines
             };
         }).get(0);
@@ -250,7 +285,7 @@
 
     $("#btnDeleteJournal").unbind('click');
     $("#btnDeleteJournal").click(function (event) {
-        deleteJournal('@Model.Id', '@Model.Id', '@Url.Action("Delete")', '@Url.Action("Index")');
+        deleteJournal('@Model.UID', '@Model.UID', '@Url.Action("Delete")', '@Url.Action("Index")');
     });
 
 </script>

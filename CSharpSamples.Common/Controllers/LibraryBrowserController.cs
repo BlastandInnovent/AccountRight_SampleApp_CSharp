@@ -23,6 +23,9 @@ using System.Web.Mvc;
 using CSharpSamples.Common.Models;
 using CSharpSamples.Common.Helpers;
 using CSharpSamples.Common.Context;
+using MYOB.AccountRight.SDK;
+using MYOB.AccountRight.SDK.Communication;
+using MYOB.AccountRight.SDK.Services;
 
 namespace CSharpSamples.Common.Controllers
 {
@@ -33,18 +36,11 @@ namespace CSharpSamples.Common.Controllers
         {
             if (isCloud)
             {
-                CloudApi = webApiUrl;
-                webApiUrl = webApiUrl.GetUrl(isCloud, OAuthInformation);
+                APIConfiguration = new ApiConfiguration(OAuthInformation.Key, OAuthInformation.Secret, OAuthInformation.RedirectUri);
             }
             else
-                NetworkApi = webApiUrl;
-
-
-            if (string.IsNullOrEmpty(search) && (sort==null || string.IsNullOrEmpty(sort.Field)))
             {
-                var companyList = ApiContext.Get<List<CompanyModel>>(webApiUrl, isCloud, OAuthInformation.AccessToken);
-                companyList.ForEach(c => c.IsCloud = isCloud);
-                return Json(companyList);
+                APIConfiguration = new ApiConfiguration(webApiUrl);                 
             }
 
             var searchCriteria = new List<SearchCriteria>();
@@ -69,12 +65,11 @@ namespace CSharpSamples.Common.Controllers
                         FieldType = typeof(string)
                     }}.ToList();
 
-            var sorting = sort == null ? Enumerable.Empty<SortDescription>() : new[] { sort };
-            var model = ApiContext.Get<List<CompanyModel>>(webApiUrl, isCloud, OAuthInformation.AccessToken, searchCriteria, LogicalOperator.or, sorting);
-            model.ForEach(c => c.IsCloud = isCloud);
+            var query = QueryStringHelper.CombineQuery(searchCriteria, LogicalOperator.or, new[]{sort}, null);
+            var service = new CompanyFileService(APIConfiguration, null, KeyService);
+            var model = service.GetRange(query).ToList() ; 
             return Json(model);
         }
-
         #endregion
     }
 }

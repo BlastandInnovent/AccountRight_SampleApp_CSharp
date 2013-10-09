@@ -1,0 +1,7 @@
+Artefacts
+/CSharpSamples.All/packages/*
+!CSharpSamples.All/packages/repositories.config
+bin
+obj
+*.suo
+*.user

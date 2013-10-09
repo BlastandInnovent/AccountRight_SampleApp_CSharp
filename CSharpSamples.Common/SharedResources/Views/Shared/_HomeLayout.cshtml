@@ -45,7 +45,7 @@
                             var controller = (CSharpSamples.Common.IBusinessController)ViewContext.Controller;
                             if(controller.IsLogon)
                             {
-                                if(controller.CompanyFile.IsCloud)
+                                if(! string.IsNullOrEmpty(controller.APIConfiguration.ClientId))
                                 {
                                     <li><a href="#" id="lnkCompanyLogOn" onclick="javascript:logOffCompany()"><img style="width: 32px" src="@Url.Content("~/Content/themes/common/images/cloud.png")"/>
                                         @controller.CompanyFile.Name as @controller.CurrentUser | Log Out</a></li>

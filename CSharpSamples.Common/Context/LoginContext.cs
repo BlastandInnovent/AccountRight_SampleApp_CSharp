@@ -19,12 +19,13 @@
 //Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
 using System;
 using System.Text;
+using MYOB.AccountRight.SDK;
 
 namespace CSharpSamples.Common.Context
 {
-    public class LoginContext
+    public class LoginContext : ICompanyFileCredentials
     {
-        public string UserId { get; set; }
+        public string Username { get; set; }
         public string Password { get; set; }
         public string AuthorizationToken { get; set; }
 
@@ -32,7 +33,7 @@ namespace CSharpSamples.Common.Context
         {
             get
             {
-                var credential = UserId + ":" + Password;
+                var credential = Username + ":" + Password;
                 var westernEuropeanEncoding = Encoding.GetEncoding("ISO-8859-1");
                 return Convert.ToBase64String(westernEuropeanEncoding.GetBytes(credential));
             }

@@ -19,14 +19,15 @@
 //Copyright 2012 MYOB Technology Pty Ltd. All rights reserved.
 }
 @using CSharpSamples.Common.Helpers
+@using CSharpSamples.Common.Utilities
 @{
     ViewBag.Title = "Account";
 }
 
-@model CSharpSamples.Account.Models.AccountModel
+@model MYOB.AccountRight.SDK.Contracts.Version2.GeneralLedger.Account
 
 <legend>@ViewBag.Title  <a href='@Url.Action("Index")' class="btn"><i class="icon-list"></i> List</a>
-    <span class="label label-info">level @Model.AccountLevel</span>
+    <span class="label label-info">level @Model.Level</span>
 @*    @if (Model.IsActive)
     {
         <span class="label label-success">Active</span>
@@ -40,13 +41,13 @@
 
 <div id="accountDetail" class="row-fluid">
     <div class="form-horizontal span6">
-        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.UID)
         @Html.HiddenFor(m => m.RowVersion)
                 
         <div class="control-group">
             <label class="control-label" for="AccountType">Account Type</label>
             <div class="controls">
-                @Html.TextBoxFor(m => m.AccountType, new { @Value = Model.AccountType.ToString().AddSpacesToSentence(), @id = "accountTypeDisplay", @readonly = "readonly" }) 
+                @Html.TextBoxFor(m => m.Classification, new { @Value = Model.Classification.ToString().AddSpacesToSentence(), @id = "Classification", @readonly = "readonly" }) 
             </div>
         </div>
 
@@ -54,10 +55,10 @@
             <label class="control-label" for="SubType">Sub Type</label>
             <div class="controls">
                 <div class="input-append">
-                    @Html.TextBoxFor(m => m.SubType, new { @Value = Model.SubType.ToString().AddSpacesToSentence(), @id = "subTypeDisplay", @name = "subTypeDisplay", @class="span10" })
+                    @Html.TextBoxFor(m => m.Type, new { @Value = Model.Type.ToString().AddSpacesToSentence(), @id = "AccountType", @name = "Type", @class="span10" })
                     <button class="btn" id="btnSubAccountType"><i class="icon-chevron-down"></i></button>
                 </div>
-                @Html.HiddenFor(m => m.SubType)
+                @Html.HiddenFor(m => m.Type)
             </div>
         </div>
 
@@ -65,7 +66,7 @@
             <label class="control-label" for="AccountNumber">Account Number</label>
             <div class="controls">
                 <div class="input-prepend">
-                    <span class="add-on" id="accountNoPrefix">@Model.AccountType.GetHashCode().ToString()</span>@Html.TextBoxFor(m => m.AccountNumber, new { @class = "span12 accountnumber" })
+                    <span class="add-on" id="accountNoPrefix">@Model.Classification.GetAccountNumberPrefix()</span>@Html.TextBoxFor(m => m.Number, new { @class = "span12 accountnumber" })
                 </div>
             </div>
         </div>
@@ -73,23 +74,21 @@
         <div class="control-group">
             <label class="control-label" for="AccountName">Account Name</label>
             <div class="controls">
-                @Html.EditorFor(m => m.AccountName)
+                @Html.EditorFor(m => m.Name)
             </div>
         </div>
-
-                
         
         <div class="control-group">
             <label class="control-label" for="OpeningAccountBalance">Opening</label>
             <div class="controls">
-                @Html.TextBoxFor(m => m.OpeningAccountBalance, new { @class = "currency", @style = "text-align:right" })
+                @Html.TextBoxFor(m => m.OpeningBalance, new { @class = "currency", @style = "text-align:right" })
             </div>
         </div>
 
         <div class="control-group">
             <label class="control-label" for="CurrentAccountBalance">Current</label>
             <div class="controls">
-                @Html.TextBoxFor(m => m.CurrentAccountBalance, new { @class = "currency", @readonly = "readonly", @style = "text-align:right" })
+                @Html.TextBoxFor(m => m.CurrentBalance, new { @class = "currency", @readonly = "readonly", @style = "text-align:right" })
             </div>
         </div>
     </div>
@@ -124,21 +123,22 @@
         <div class="control-group">
             <label class="control-label" for="AccountDescription">Description</label>
             <div class="controls">
-                @Html.TextAreaFor(m => m.AccountDescription, new { @rows = "4" })
+                @Html.TextAreaFor(m => m.Description, new { @rows = "4" })
             </div>
         </div>   
         
         <div class="control-group">
             <label class="control-label" for="TaxCode">Tax Code</label>
-            <div class="controls">
-                @Html.EditorFor(m => m.TaxCodeId)
+            <div class="controls" id="TaxCodeDetails">
+                @Html.HiddenFor(m => m.TaxCode.UID)
+                @Html.EditorFor(m => m.TaxCode.Code)
             </div>
         </div>
         
         <div class="control-group">
             <label class="control-label" for="Currency">Currency</label>
             <div class="controls">
-                @Html.EditorFor(m => m.Currency)
+                
             </div>
         </div>
     </div>
@@ -253,7 +253,7 @@
     
     $(function () {
         $("#isActiveOption").find("button").each(function () {
-            if ($(this).val() == '@Model.IsInactive') {
+            if ($(this).val() == '@Model.IsActive') {
                 $(this).addClass('active');
             }
         });
@@ -265,7 +265,7 @@
         });
 
         $("#isCreateBankFileOption").find("button").each(function () {
-            if ($(this).val() == '@Model.BankingDetails.CreateBankFile') {
+            if ($(this).val() == '@Model.BankingDetails.CreateBankFiles') {
                 $(this).addClass('active');
             }
         });
@@ -279,7 +279,7 @@
 
         var subTypes = JSON.parse('@Html.Raw(ViewBag.SubTypes)');
 
-        $("#subTypeDisplay").autocomplete({
+        $("#Type").autocomplete({
             minLength: 0,
             source: subTypes,
             focus: function (event, ui) {
@@ -288,9 +288,9 @@
             },
             select: function (event, ui) {
                 $("#SubType").val(ui.item.SubType);
-                $("#subTypeDisplay").val(ui.item.SubTypeText);
-                $("#accountNoPrefix").text(ui.item.AccountType);
-                $("#accountTypeDisplay").val(ui.item.AccountTypeText);
+                $("#Type").val(ui.item.SubTypeText);
+                $("#accountNoPrefix").text(wtf(ui.item.AccountTypePrefix));
+                $("#Classification").val(ui.item.AccountTypeText);
                 return false;
             }
         })
@@ -330,23 +330,30 @@
             };
         }).get(0);
 
+        var tax = $("#TaxCodeDetails").map(function () {
+            return {
+                UID: $(this).find("input[name='TaxCode.UID']").first().val(),
+                Code: $(this).find("input[name='TaxCode.Code']").first().val(),
+            };
+        }).get(0);
+
         var account = $("#accountDetail").map(function () {
             return {
                 RowVersion: $(this).find("input[name='RowVersion']").first().val(),
-                Id: $(this).find("input[name='Id']").first().val(),
-                AccountNumber: $(this).find("input[name='AccountNumber']").first().val(),
-                AccountName: $(this).find("input[name='AccountName']").first().val(),
-                AccountDescription: $(this).find("textarea[name='AccountDescription']").first().val(),
+                UID: $(this).find("input[name='UID']").first().val(),
+                Number: $(this).find("input[name='Number']").first().val(),
+                Name: $(this).find("input[name='Name']").first().val(),
+                Description: $(this).find("textarea[name='AccountDescription']").first().val(),
                 ParentAccountId: "",
-                IsInactive: $("#isActiveOption > button.active").val(),
+                IsActive: $("#isActiveOption > button.active").val(),
                 IsHeader: $("#isHeaderOption > button.active").val(),
-                TaxCodeId: $(this).find("input[name='TaxCodeId']").first().val(),
-                Currency: $(this).find("input[name='Currency']").first().val(),
-                AccountLevel: $(this).find("input[name='AccountLevel']").first().val(),
-                AccountType: $("#accountNoPrefix").text(),
-                SubType: $(this).find("input[id='SubType']").first().val(),
-                OpeningAccountBalance: $(this).find("input[name='OpeningAccountBalance']").first().asNumber().toString(),
-                CurrentAccountBalance: $(this).find("input[name='CurrentAccountBalance']").first().asNumber().toString(),
+                //TaxCode: $(this).find("input[name='TaxCode.Code']").first().val(),             
+                TaxCode: tax,
+                Level: $(this).find("input[name='Level']").first().val(),
+                Classification: $("#accountNoPrefix").text(),
+                Type: $(this).find("input[id='Type']").first().val(),
+                OpeningBalance: $(this).find("input[name='OpeningBalance']").first().asNumber().toString(),
+                CurrentBalance: $(this).find("input[name='CurrentBalance']").first().asNumber().toString(),
                 BankingDetails: bankingDetails
             };
         }).get(0);
@@ -374,21 +381,26 @@
     function recordSavedSuccess() {
         window.location = '@Url.Action("Index", "Account")';
     }
+    
+    function wtf(v) {
+        alert(v);
+        return v;
+    }
 
     $("#btnSubAccountType").unbind("click");
     $("#btnSubAccountType").click(function (event) {
-        if ($("input#subTypeDisplay").autocomplete("widget").is(":visible")) {
-            $("input#subTypeDisplay").autocomplete("close");
+        if ($("input#Type").autocomplete("widget").is(":visible")) {
+            $("input#Type").autocomplete("close");
             return;
         }
 
         $(this).blur();
-        $("input#subTypeDisplay").autocomplete('search', '');
-        $("input#subTypeDisplay").focus();
+        $("input#Type").autocomplete('search', '');
+        $("input#Type").focus();
     });
 
     $("#btnDeleteJournal").unbind("click");
     $("#btnDeleteJournal").click(function (event) {
-        deleteAccount('@Model.Id', '@Model.AccountNumberFormatted @Model.AccountName', '@Url.Action("DeleteAccount")', '@Url.Action("Index")');
+        deleteAccount('@Model.UID', '@Model.Number @Model.Name', '@Url.Action("DeleteAccount")', '@Url.Action("Index")');
     });
 </script>

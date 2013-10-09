@@ -22,7 +22,7 @@ using CSharpSamples.Common;
 
 namespace CSharpSamples.All.Controllers
 {
-    public class CommandCentreController : BusinessController<object>
+    public class CommandCentreController : Common.ControllerBase //ReadableBusinessController<object>
     {
         public ActionResult Index()
         {
