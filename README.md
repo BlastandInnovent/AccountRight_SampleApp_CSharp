@@ -1,4 +1,7 @@
-AccountRight API Sample App with C#
+Project out of date!
 =========================
+Please use [the updated AccountRight C# Sample here](https://github.com/MYOB-Technology/accountright_sample_csharp)
 
-Example C# integration app with AccountRight Live API
+
+
+
